@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.reflections.Reflections;
-import org.saucistophe.increledger.model.occupations.Occupation;
 
 class OccupationTest {
 

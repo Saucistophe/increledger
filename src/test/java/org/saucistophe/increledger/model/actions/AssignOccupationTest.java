@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.actions.AssignOccupation;
 import org.saucistophe.increledger.model.occupations.Woodcutter;
 
 class AssignOccupationTest {
