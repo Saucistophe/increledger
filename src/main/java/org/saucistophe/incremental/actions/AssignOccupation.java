@@ -7,24 +7,31 @@ import org.saucistophe.incremental.occupations.Occupation;
 
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssignOccupation<T extends Occupation> implements Action {
+public class AssignOccupation implements Action {
 
-  long numberOfAssignments;
-  Class<T> occupation;
+  Occupation occupation;
 
   @Override
   public boolean isValid(Game game) {
     if (occupation == null) return false;
-    if (numberOfAssignments <1) return false;
-    if (numberOfAssignments > game.getFreePopulation()) return false;
-
-    return true;
+    if (occupation.getNumbersOfAssignees() < 1) return false;
+    return occupation.getNumbersOfAssignees() <= game.getFreePopulation();
   }
 
   @Override
   public void execute(Game game) {
-//    var occupations = game.getOccupations();
-//    occupations.computeIfAbsent(occupation,o -> 0L );
-//    occupations.put(occupation, occupations.get(occupation) + numberOfAssignments);
+    var gameOccupations = game.getOccupations();
+    var existingOccupation =
+        gameOccupations.stream()
+            .filter(o -> o.getClass().equals(occupation.getClass()))
+            .findFirst();
+    if (existingOccupation.isEmpty()) {
+      gameOccupations.add(occupation);
+    } else
+      existingOccupation
+          .get()
+          .setNumbersOfAssignees(
+              existingOccupation.get().getNumbersOfAssignees()
+                  + occupation.getNumbersOfAssignees());
   }
 }
