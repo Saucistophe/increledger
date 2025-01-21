@@ -1,4 +1,4 @@
-package org.saucistophe.incremental;
+package org.saucistophe.increledger.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -7,8 +7,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
-import org.saucistophe.incremental.occupations.Occupation;
-import org.saucistophe.incremental.resources.Resource;
+import org.saucistophe.increledger.model.occupations.Occupation;
+import org.saucistophe.increledger.model.resources.Resource;
 
 @Data
 public class Game {

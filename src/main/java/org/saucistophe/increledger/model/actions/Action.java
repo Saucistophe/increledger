@@ -1,6 +1,6 @@
-package org.saucistophe.incremental.actions;
+package org.saucistophe.increledger.model.actions;
 
-import org.saucistophe.incremental.Game;
+import org.saucistophe.increledger.model.Game;
 
 public interface Action {
   public boolean isValid(Game game);

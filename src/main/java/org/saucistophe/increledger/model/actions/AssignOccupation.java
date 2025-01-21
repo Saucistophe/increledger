@@ -1,9 +1,9 @@
-package org.saucistophe.incremental.actions;
+package org.saucistophe.increledger.model.actions;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.saucistophe.incremental.Game;
-import org.saucistophe.incremental.occupations.Occupation;
+import org.saucistophe.increledger.model.Game;
+import org.saucistophe.increledger.model.occupations.Occupation;
 
 @NoArgsConstructor
 @AllArgsConstructor

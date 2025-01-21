@@ -1,20 +1,19 @@
-package org.saucistophe.incremental.resources;
+package org.saucistophe.increledger.model.occupations;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.saucistophe.incremental.occupations.Woodcutter;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = Stone.class, name = "Stone"),
-  @JsonSubTypes.Type(value = Wood.class, name = "Wood")
+  @JsonSubTypes.Type(value = Woodcutter.class, name = "Woodcutter"),
+  @JsonSubTypes.Type(value = Gatherer.class, name = "Gatherer")
 })
 @SuperBuilder
 @NoArgsConstructor
 @Data
-public abstract class Resource {
-  protected long amount;
+public abstract class Occupation {
+  protected long numbersOfAssignees;
 }

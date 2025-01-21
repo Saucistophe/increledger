@@ -1,11 +1,12 @@
-package org.saucistophe.incremental.actions;
+package org.saucistophe.increledger.model.actions;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.saucistophe.incremental.Game;
-import org.saucistophe.incremental.occupations.Woodcutter;
+import org.saucistophe.increledger.model.Game;
+import org.saucistophe.increledger.model.actions.AssignOccupation;
+import org.saucistophe.increledger.model.occupations.Woodcutter;
 
 class AssignOccupationTest {
 

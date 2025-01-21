@@ -1,8 +1,8 @@
-package org.saucistophe.incremental.occupations;
+package org.saucistophe.increledger.model.occupations;
 
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
 @NoArgsConstructor
-public class Woodcutter extends Occupation {}
+public class Gatherer extends Occupation {}

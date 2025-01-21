@@ -1,12 +1,12 @@
-package org.saucistophe.incremental;
+package org.saucistophe.increledger.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.saucistophe.incremental.occupations.Woodcutter;
-import org.saucistophe.incremental.resources.Wood;
+import org.saucistophe.increledger.model.occupations.Woodcutter;
+import org.saucistophe.increledger.model.resources.Wood;
 
 class GameTest {
 
