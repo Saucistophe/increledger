@@ -13,6 +13,7 @@ import org.saucistophe.increledger.model.resources.Resource;
 @Data
 public class Game {
 
+  private long maxPopulation = 5;
   private long population = 1;
 
   private List<Occupation> occupations = new ArrayList<>();
@@ -22,6 +23,15 @@ public class Game {
 
   public void updateTimestamp() {
     timestamp = Instant.now().toEpochMilli();
+  }
+
+  public Resource getResource(Class<? extends Resource> clazz) {
+    for (Resource resource : resources) {
+      if (resource.getClass().equals(clazz)) {
+        return resource;
+      }
+    }
+    return null;
   }
 
   @JsonIgnore

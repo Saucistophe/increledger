@@ -1,21 +1,20 @@
-package org.saucistophe.increledger.model.resources;
+package org.saucistophe.increledger.model.tech;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.saucistophe.increledger.model.resources.Resource;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = Stone.class, name = "Stone"),
-  @JsonSubTypes.Type(value = Wood.class, name = "Wood"),
-  @JsonSubTypes.Type(value = Food.class, name = "Food"),
-  @JsonSubTypes.Type(value = Knowledge.class, name = "Knowledge")
+  @JsonSubTypes.Type(value = Hatchet.class, name = "Hatchet"),
 })
 @SuperBuilder
 @NoArgsConstructor
 @Data
-public abstract class Resource {
-  protected double amount;
+public abstract class Tech {
+  abstract List<Resource> requirements();
 }

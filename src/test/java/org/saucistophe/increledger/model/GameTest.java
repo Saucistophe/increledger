@@ -20,6 +20,7 @@ class GameTest {
     assertEquals(
         """
     {
+      "maxPopulation" : 5,
       "population" : 1234,
       "occupations" : [ {
         "type" : "Woodcutter",
@@ -27,7 +28,7 @@ class GameTest {
       } ],
       "resources" : [ {
         "type" : "Wood",
-        "amount" : 1234
+        "amount" : 1234.0
       } ],
       "timestamp" : 1234
     }""",
@@ -40,6 +41,7 @@ class GameTest {
         Game.fromJson(
             """
   {
+    "maxPopulation" : 5,
     "population" : 1234,
     "occupations" : [ {
       "type" : "Woodcutter",
@@ -47,7 +49,7 @@ class GameTest {
     } ],
     "resources" : [ {
       "type" : "Wood",
-      "amount" : 1234
+      "amount" : 1234.0
     } ],
     "timestamp" : 1234
   }""");
@@ -56,5 +58,4 @@ class GameTest {
     assertEquals(
         List.of(Woodcutter.builder().numbersOfAssignees(12).build()), game.getOccupations());
   }
-
 }
