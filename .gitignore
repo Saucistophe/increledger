@@ -30,3 +30,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/in.json
+/public_key.pem
+/private_key.pem

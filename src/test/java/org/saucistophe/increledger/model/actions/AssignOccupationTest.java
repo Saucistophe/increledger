@@ -1,11 +1,11 @@
 package org.saucistophe.increledger.model.actions;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.saucistophe.increledger.model.occupations.Occupation.*;
 
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.occupations.Woodcutter;
 
 class AssignOccupationTest {
 
@@ -13,7 +13,7 @@ class AssignOccupationTest {
   void isValid() {
 
     Game game = new Game();
-    var action = new AssignOccupation(Woodcutter.builder().numbersOfAssignees(10).build());
+    var action = new AssignOccupation(WOOD_CUTTER, 10L);
 
     assertFalse(action.isValid(game));
 
@@ -21,21 +21,21 @@ class AssignOccupationTest {
     assertTrue(action.isValid(game));
 
     game.setPopulation(14);
-    game.getOccupations().add(Woodcutter.builder().numbersOfAssignees(5).build());
+    game.getOccupations().put(WOOD_CUTTER, 5L);
     assertFalse(action.isValid(game));
 
     game.setPopulation(15);
     assertTrue(action.isValid(game));
-    }
+  }
 
   @Test
   void execute() {
     Game game = new Game();
     game.setPopulation(10);
-    var action = new AssignOccupation(Woodcutter.builder().numbersOfAssignees(3).build());
+    var action = new AssignOccupation(WOOD_CUTTER, 3L);
 
     action.execute(game);
-    assertEquals(List.of(Woodcutter.builder().numbersOfAssignees(3).build()), game.getOccupations());
+    assertEquals(Map.of(WOOD_CUTTER, 3L), game.getOccupations());
     assertEquals(7, game.getFreePopulation());
-    }
+  }
 }

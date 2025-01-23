@@ -1,23 +1,19 @@
 package org.saucistophe.increledger.model.occupations;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import java.util.List;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import static org.saucistophe.increledger.model.resources.Resource.*;
+
+import com.fasterxml.jackson.databind.EnumNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.EnumNaming;
+import java.util.Map;
+import lombok.AllArgsConstructor;
 import org.saucistophe.increledger.model.resources.Resource;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({
-  @JsonSubTypes.Type(value = Woodcutter.class, name = "Woodcutter"),
-  @JsonSubTypes.Type(value = Gatherer.class, name = "Gatherer")
-})
-@SuperBuilder
-@NoArgsConstructor
-@Data
-public abstract class Occupation {
-  protected long numbersOfAssignees;
+@EnumNaming(EnumNamingStrategies.CamelCaseStrategy.class)
+@AllArgsConstructor
+public enum Occupation {
+  HUNTER(Map.of(FOOD, 1.)),
+  GATHERER(Map.of(FOOD, 0.5, KNOWLEDGE, 0.1)),
+  WOOD_CUTTER(Map.of(WOOD, 1.));
 
-  public abstract List<Resource> produces();
+  public final Map<Resource, Double> resourcesProduced;
 }

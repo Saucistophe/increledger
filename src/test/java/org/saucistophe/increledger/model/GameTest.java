@@ -3,10 +3,10 @@ package org.saucistophe.increledger.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.saucistophe.increledger.model.occupations.Woodcutter;
-import org.saucistophe.increledger.model.resources.Wood;
+import org.saucistophe.increledger.model.occupations.Occupation;
+import org.saucistophe.increledger.model.resources.Resource;
 
 class GameTest {
 
@@ -15,21 +15,19 @@ class GameTest {
     Game game = new Game();
     game.setPopulation(1234L);
     game.setTimestamp(1234L);
-    game.getOccupations().add(Woodcutter.builder().numbersOfAssignees(12).build());
-    game.getResources().add(Wood.builder().amount(1234).build());
+    game.getOccupations().put(Occupation.WOOD_CUTTER, 12L);
+    game.getResources().put(Resource.WOOD, 1234.);
     assertEquals(
         """
     {
       "maxPopulation" : 5,
       "population" : 1234,
-      "occupations" : [ {
-        "type" : "Woodcutter",
-        "numbersOfAssignees" : 12
-      } ],
-      "resources" : [ {
-        "type" : "Wood",
-        "amount" : 1234.0
-      } ],
+      "occupations" : {
+        "woodCutter" : 12
+      },
+      "resources" : {
+        "wood" : 1234.0
+      },
       "timestamp" : 1234
     }""",
         game.toJson());
@@ -43,19 +41,16 @@ class GameTest {
   {
     "maxPopulation" : 5,
     "population" : 1234,
-    "occupations" : [ {
-      "type" : "Woodcutter",
-      "numbersOfAssignees" : 12
-    } ],
-    "resources" : [ {
-      "type" : "Wood",
-      "amount" : 1234.0
-    } ],
+    "occupations" : {
+      "woodCutter" : 12
+    },
+    "resources" : {
+      "wood" : 1234.0
+    },
     "timestamp" : 1234
   }""");
 
     assertEquals(1234L, game.getPopulation());
-    assertEquals(
-        List.of(Woodcutter.builder().numbersOfAssignees(12).build()), game.getOccupations());
+    assertEquals(Map.of(Occupation.WOOD_CUTTER, 12L), game.getOccupations());
   }
 }

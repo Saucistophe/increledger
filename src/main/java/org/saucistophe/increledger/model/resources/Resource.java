@@ -1,21 +1,15 @@
 package org.saucistophe.increledger.model.resources;
 
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import com.fasterxml.jackson.databind.EnumNamingStrategies;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
+import com.fasterxml.jackson.databind.annotation.EnumNaming;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({
-  @JsonSubTypes.Type(value = Stone.class, name = "Stone"),
-  @JsonSubTypes.Type(value = Wood.class, name = "Wood"),
-  @JsonSubTypes.Type(value = Food.class, name = "Food"),
-  @JsonSubTypes.Type(value = Knowledge.class, name = "Knowledge")
-})
-@SuperBuilder
-@NoArgsConstructor
-@Data
-public abstract class Resource {
-  protected double amount;
+@EnumNaming(EnumNamingStrategies.CamelCaseStrategy.class)
+@JsonNaming(PropertyNamingStrategies.LowerCamelCaseStrategy.class)
+public enum Resource {
+  FOOD,
+  KNOWLEDGE,
+  STONE,
+  WOOD;
 }

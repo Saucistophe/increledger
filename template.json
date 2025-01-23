@@ -1,0 +1,17 @@
+{
+  "game" : {
+    "maxPopulation" : 5,
+    "population" : 1,
+    "occupations" : {
+      "woodCutter" : 1
+    },
+    "resources" : { },
+    "timestamp" : 1737464511130
+  },
+  "signature" : "TODO",
+  "actions": [{
+    "type": "Assign",
+    "occupation": "woodCutter",
+    "numbersOfAssignees": 2
+  }]
+}

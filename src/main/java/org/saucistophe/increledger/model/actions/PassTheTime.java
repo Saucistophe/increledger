@@ -3,7 +3,6 @@ package org.saucistophe.increledger.model.actions;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.occupations.Occupation;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,13 +17,18 @@ public class PassTheTime implements Action {
 
   @Override
   public void execute(Game game) {
-    for (Occupation occupation : game.getOccupations()) {
-      var productedResources = occupation.produces();
-      for (var productedResource : productedResources) {
-        var currentResource = game.getResource(productedResource.getClass());
-        if (currentResource == null) {
-          // MEH game.getResources().add(productedResource);
-        }
+    for (var entry : game.getOccupations().entrySet()) {
+      var occupation = entry.getKey();
+      var numberOfAssignees = entry.getValue();
+
+      for (var producedResource : occupation.resourcesProduced.entrySet()) {
+        var resource = producedResource.getKey();
+        var amount = producedResource.getValue();
+
+        var existingAmount = game.getResources().getOrDefault(resource, 0.);
+        var newAmount = existingAmount + amount * numberOfAssignees * millisElapsed / 1000.;
+        game.getResources().put(resource, newAmount);
+        // TODO handle storage here
       }
     }
   }

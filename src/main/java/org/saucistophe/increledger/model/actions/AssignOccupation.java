@@ -1,37 +1,30 @@
 package org.saucistophe.increledger.model.actions;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.occupations.Occupation;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class AssignOccupation implements Action {
 
   Occupation occupation;
+  Long numbersOfAssignees;
 
   @Override
   public boolean isValid(Game game) {
     if (occupation == null) return false;
-    if (occupation.getNumbersOfAssignees() < 1) return false;
-    return occupation.getNumbersOfAssignees() <= game.getFreePopulation();
+    if (numbersOfAssignees < 1) return false;
+    return numbersOfAssignees <= game.getFreePopulation();
   }
 
   @Override
   public void execute(Game game) {
     var gameOccupations = game.getOccupations();
-    var existingOccupation =
-        gameOccupations.stream()
-            .filter(o -> o.getClass().equals(occupation.getClass()))
-            .findFirst();
-    if (existingOccupation.isEmpty()) {
-      gameOccupations.add(occupation);
-    } else
-      existingOccupation
-          .get()
-          .setNumbersOfAssignees(
-              existingOccupation.get().getNumbersOfAssignees()
-                  + occupation.getNumbersOfAssignees());
+    var amount = gameOccupations.getOrDefault(occupation, 0L);
+    gameOccupations.put(occupation, amount + numbersOfAssignees);
   }
 }

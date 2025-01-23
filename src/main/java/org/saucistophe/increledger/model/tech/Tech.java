@@ -2,7 +2,7 @@ package org.saucistophe.increledger.model.tech;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -16,5 +16,5 @@ import org.saucistophe.increledger.model.resources.Resource;
 @NoArgsConstructor
 @Data
 public abstract class Tech {
-  abstract List<Resource> requirements();
+  abstract Map<Resource, Long> requirements();
 }
