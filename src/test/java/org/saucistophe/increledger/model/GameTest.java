@@ -3,6 +3,7 @@ package org.saucistophe.increledger.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.saucistophe.increledger.model.occupations.Occupation;
@@ -12,6 +13,7 @@ class GameTest {
 
   @Test
   void serialize() throws JsonProcessingException {
+    var mapper = new ObjectMapper();
     Game game = new Game();
     game.setPopulation(1234L);
     game.setTimestamp(1234L);
@@ -28,15 +30,17 @@ class GameTest {
       "resources" : {
         "wood" : 1234.0
       },
+      "techs" : [ ],
       "timestamp" : 1234
     }""",
-        game.toJson());
+        mapper.writerWithDefaultPrettyPrinter().writeValueAsString(game));
   }
 
   @Test
   void deserialize() throws JsonProcessingException {
+    ObjectMapper mapper = new ObjectMapper();
     var game =
-        Game.fromJson(
+        mapper.readValue(
             """
   {
     "maxPopulation" : 5,
@@ -48,7 +52,8 @@ class GameTest {
       "wood" : 1234.0
     },
     "timestamp" : 1234
-  }""");
+  }""",
+            Game.class);
 
     assertEquals(1234L, game.getPopulation());
     assertEquals(Map.of(Occupation.WOOD_CUTTER, 12L), game.getOccupations());

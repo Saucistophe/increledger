@@ -11,5 +11,5 @@ public enum Resource {
   FOOD,
   KNOWLEDGE,
   STONE,
-  WOOD;
+  WOOD
 }

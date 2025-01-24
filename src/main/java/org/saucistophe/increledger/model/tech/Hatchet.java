@@ -11,7 +11,7 @@ import org.saucistophe.increledger.model.resources.Resource;
 @NoArgsConstructor
 public class Hatchet extends Tech {
   @Override
-  Map<Resource, Long> requirements() {
-    return Map.of(WOOD, 10L, STONE, 3L);
+  public Map<Resource, Long> requirements() {
+    return Map.of(WOOD, 10L, KNOWLEDGE, 10L);
   }
 }

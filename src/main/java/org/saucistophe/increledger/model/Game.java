@@ -1,23 +1,22 @@
 package org.saucistophe.increledger.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import lombok.Data;
 import org.saucistophe.increledger.model.occupations.Occupation;
 import org.saucistophe.increledger.model.resources.Resource;
+import org.saucistophe.increledger.model.tech.Tech;
 
 @Data
 public class Game {
 
   private long maxPopulation = 5;
-  private long population = 1;
+  private long population = 2;
 
-  private Map<Occupation, Long> occupations = new HashMap<>();
-  private Map<Resource, Double> resources = new HashMap<>();
+  private Map<Occupation, Long> occupations = new EnumMap<>(Occupation.class);
+  private Map<Resource, Double> resources = new EnumMap<>(Resource.class);
+  private List<Tech> techs = new ArrayList<>();
 
   private Long timestamp = Instant.now().toEpochMilli();
 
@@ -30,18 +29,17 @@ public class Game {
     return population - occupations.values().stream().mapToLong(Long::longValue).sum();
   }
 
-  @JsonIgnore
-  public String toJson() {
-    // TODO move this to other package
-    try {
-      return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException(e);
+  public void spendResources(Map<Resource, Long> resourcesToSpend) {
+    for (var entry : resourcesToSpend.entrySet()) {
+      resources.put(entry.getKey(), resources.get(entry.getKey()) - entry.getValue());
     }
   }
 
-  public static Game fromJson(String json) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    return mapper.readValue(json, Game.class);
+  public boolean hasResources(Map<Resource, Long> requirements) {
+    for (var entry : requirements.entrySet()) {
+      if (!resources.containsKey(entry.getKey())) return false;
+      if (resources.get(entry.getKey()) < entry.getValue()) return false;
+    }
+    return true;
   }
 }

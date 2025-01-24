@@ -12,7 +12,7 @@ public class PassTheTime implements Action {
 
   @Override
   public boolean isValid(Game game) {
-    return true;
+    return millisElapsed > 0;
   }
 
   @Override

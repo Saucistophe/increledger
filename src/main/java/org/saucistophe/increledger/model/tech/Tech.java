@@ -16,5 +16,5 @@ import org.saucistophe.increledger.model.resources.Resource;
 @NoArgsConstructor
 @Data
 public abstract class Tech {
-  abstract Map<Resource, Long> requirements();
+  public abstract Map<Resource, Long> requirements();
 }

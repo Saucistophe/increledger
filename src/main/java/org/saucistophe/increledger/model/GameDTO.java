@@ -11,6 +11,6 @@ public class GameDTO {
   private Game game;
   private String signature;
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   private List<Action> actions = null;
 }

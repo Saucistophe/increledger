@@ -11,8 +11,11 @@ class PassTheTimeTest {
 
   @Test
   void isValid() {
-    var action = new PassTheTime();
+    var action = new PassTheTime(12);
     assertTrue(action.isValid(new Game()));
+
+    action = new PassTheTime(0);
+    assertFalse(action.isValid(new Game()));
   }
 
   @Test

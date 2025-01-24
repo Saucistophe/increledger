@@ -1,30 +1,49 @@
 package org.saucistophe.increledger.logic;
 
-import java.security.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.quarkus.logging.Log;
+import io.quarkus.runtime.StartupEvent;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.event.Observes;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.InternalServerErrorException;
 import java.util.ArrayList;
+import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.GameDTO;
 import org.saucistophe.increledger.model.actions.PassTheTime;
 
+@ApplicationScoped
+@RequiredArgsConstructor
 public class GameService {
 
-  private CryptoService cryptoService = new CryptoService();
+  private final CryptoService cryptoService;
+  private ObjectMapper objectMapper;
+
+  void startup(@Observes StartupEvent event) {
+    // Custom dedicated object mapper for the specific case of serializing and signing
+    objectMapper = new ObjectMapper();
+    // Ignore empty properties, so that new ones can be added without messing with existing games
+    objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+  }
 
   public GameDTO newGame() {
     var game = new Game();
     var resultGameDto = new GameDTO();
     resultGameDto.setGame(game);
-    resultGameDto.setSignature(cryptoService.sign(game.toJson()));
+    resultGameDto.setSignature(cryptoService.sign(toJson(game)));
 
     return resultGameDto;
   }
 
   public GameDTO process(GameDTO gameDto) {
     // Check signature
-    var verification = cryptoService.verify(gameDto.getGame().toJson(), gameDto.getSignature());
+    var verification = cryptoService.verify(toJson(gameDto.getGame()), gameDto.getSignature());
     if (!verification) {
       System.err.println("Invalid signature");
-      return null;
+      throw new BadRequestException("Invalid signature");
     }
 
     var game = gameDto.getGame();
@@ -37,11 +56,11 @@ public class GameService {
       actions = new ArrayList<>();
     }
     // First pass the time
-    actions.add(0, new PassTheTime(currentTime - previousTime));
+    actions.addFirst(new PassTheTime(currentTime - previousTime));
     for (var action : actions) {
       if (!action.isValid(game)) {
-        System.err.println("Invalid action: " + action);
-        return null;
+        Log.error("Invalid action: " + action);
+        throw new BadRequestException("Invalid action");
       }
       action.execute(game);
     }
@@ -49,8 +68,17 @@ public class GameService {
     // Sign the game
     var resultGameDto = new GameDTO();
     resultGameDto.setGame(game);
-    resultGameDto.setSignature(cryptoService.sign(game.toJson()));
+    resultGameDto.setSignature(cryptoService.sign(toJson(game)));
 
     return resultGameDto;
+  }
+
+  private String toJson(Game game) {
+    try {
+      return objectMapper.writeValueAsString(game);
+    } catch (JsonProcessingException e) {
+      Log.error("Could not serialize game", e);
+      throw new InternalServerErrorException(e);
+    }
   }
 }
