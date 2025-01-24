@@ -10,10 +10,12 @@ import jakarta.enterprise.event.Observes;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.GameDTO;
-import org.saucistophe.increledger.model.actions.PassTheTime;
+import org.saucistophe.increledger.model.resources.Resource;
 
 @ApplicationScoped
 @RequiredArgsConstructor
@@ -38,6 +40,24 @@ public class GameService {
     return resultGameDto;
   }
 
+  public Map<Resource, Double> getCurrentProduction(Game game) {
+    Map<Resource, Double> currentProduction = new EnumMap<>(Resource.class);
+    for (var entry : game.getOccupations().entrySet()) {
+      var occupation = entry.getKey();
+      var numberOfAssignees = entry.getValue();
+
+      for (var producedResource : occupation.resourcesProduced.entrySet()) {
+        var resource = producedResource.getKey();
+        var amount = producedResource.getValue();
+
+        var existingAmount = currentProduction.getOrDefault(resource, 0.);
+        var newAmount = existingAmount + amount * numberOfAssignees;
+        currentProduction.put(resource, newAmount);
+      }
+    }
+    return currentProduction;
+  }
+
   public GameDTO process(GameDTO gameDto) {
     // Check signature
     var verification = cryptoService.verify(toJson(gameDto.getGame()), gameDto.getSignature());
@@ -50,13 +70,24 @@ public class GameService {
     var previousTime = game.getTimestamp();
     game.updateTimestamp();
     var currentTime = game.getTimestamp();
+    var ellapsedMillis = currentTime - previousTime;
 
     var actions = gameDto.getActions();
     if (actions == null) {
       actions = new ArrayList<>();
     }
+
     // First pass the time
-    actions.addFirst(new PassTheTime(currentTime - previousTime));
+    var production = getCurrentProduction(game);
+    for (var producedResource : production.entrySet()) {
+      var resource = producedResource.getKey();
+      var amount = producedResource.getValue();
+
+      var existingAmount = game.getResources().getOrDefault(resource, 0.);
+      var newAmount = existingAmount + amount * ellapsedMillis / 1000.;
+      game.getResources().put(resource, newAmount);
+    }
+
     for (var action : actions) {
       if (!action.isValid(game)) {
         Log.error("Invalid action: " + action);
