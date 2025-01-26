@@ -10,25 +10,26 @@ import jakarta.enterprise.event.Observes;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.util.ArrayList;
-import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.GameDTO;
-import org.saucistophe.increledger.model.resources.Resource;
+import org.saucistophe.increledger.model.dto.GameDTO;
+import org.saucistophe.increledger.model.dto.GameRules;
 
 @ApplicationScoped
 @RequiredArgsConstructor
 public class GameService {
 
+  private final GameRules gameRules;
   private final CryptoService cryptoService;
-  private ObjectMapper objectMapper;
+  private ObjectMapper objectMapperForSignature;
 
   void startup(@Observes StartupEvent event) {
     // Custom dedicated object mapper for the specific case of serializing and signing
-    objectMapper = new ObjectMapper();
+    objectMapperForSignature = new ObjectMapper();
     // Ignore empty properties, so that new ones can be added without messing with existing games
-    objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
+    objectMapperForSignature.setDefaultPropertyInclusion(JsonInclude.Include.NON_EMPTY);
   }
 
   public GameDTO newGame() {
@@ -40,13 +41,14 @@ public class GameService {
     return resultGameDto;
   }
 
-  public Map<Resource, Double> getCurrentProduction(Game game) {
-    Map<Resource, Double> currentProduction = new EnumMap<>(Resource.class);
+  public Map<String, Double> getCurrentProduction(Game game) {
+    Map<String, Double> currentProduction = new HashMap<>();
     for (var entry : game.getOccupations().entrySet()) {
-      var occupation = entry.getKey();
+      var occupationId = entry.getKey();
+      var occupation = gameRules.getOccupationById(occupationId);
       var numberOfAssignees = entry.getValue();
 
-      for (var producedResource : occupation.resourcesProduced.entrySet()) {
+      for (var producedResource : occupation.getResourcesProduced().entrySet()) {
         var resource = producedResource.getKey();
         var amount = producedResource.getValue();
 
@@ -106,7 +108,7 @@ public class GameService {
 
   private String toJson(Game game) {
     try {
-      return objectMapper.writeValueAsString(game);
+      return objectMapperForSignature.writeValueAsString(game);
     } catch (JsonProcessingException e) {
       Log.error("Could not serialize game", e);
       throw new InternalServerErrorException(e);

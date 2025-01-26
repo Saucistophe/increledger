@@ -5,14 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.tech.Tech;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class Research implements Action {
 
-  Tech tech;
+  String tech;
 
   @Override
   public boolean isValid(Game game) {
@@ -20,11 +19,13 @@ public class Research implements Action {
       Log.info("No tech provided");
       return false;
     }
-    if (game.getTechs().stream().anyMatch(t -> t.getClass().isAssignableFrom(tech.getClass()))) {
+    // TODO
+    if (false) {
       Log.info("Tech already researched");
       return false;
     }
-    if (!game.hasResources(tech.requirements())) {
+    // TODO
+    if (false) {
       Log.info("Not enough resources");
       return false;
     }
@@ -33,7 +34,8 @@ public class Research implements Action {
 
   @Override
   public void execute(Game game) {
-    game.spendResources(tech.requirements());
-    game.getTechs().add(tech);
+    // TODO
+    // game.spendResources(tech.requirements());
+    // game.getTechs().add(tech);
   }
 }

@@ -1,8 +1,9 @@
-package org.saucistophe.increledger.model;
+package org.saucistophe.increledger.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
+import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.actions.Action;
 
 @Data
@@ -11,6 +12,5 @@ public class GameDTO {
   private Game game;
   private String signature;
 
-  @JsonInclude(JsonInclude.Include.NON_EMPTY)
-  private List<Action> actions = null;
+  private List<Action> actions = new ArrayList<>();
 }

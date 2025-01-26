@@ -8,10 +8,6 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import org.saucistophe.increledger.logic.GameService;
 import org.saucistophe.increledger.model.actions.Action;
-import org.saucistophe.increledger.model.actions.AssignOccupation;
-import org.saucistophe.increledger.model.actions.Research;
-import org.saucistophe.increledger.model.occupations.Occupation;
-import org.saucistophe.increledger.model.tech.Hatchet;
 
 @Path("/action")
 @AllArgsConstructor
@@ -23,6 +19,8 @@ public class ActionResource {
   @Path("/samples")
   @Produces(MediaType.APPLICATION_JSON)
   public List<Action> getSamples() {
-    return List.of(new AssignOccupation(Occupation.WOOD_CUTTER, 1L), new Research(new Hatchet()));
+    // TODO
+    // return List.of(new AssignOccupation(, 1L), new Research(new Hatchet()));
+    return List.of();
   }
 }

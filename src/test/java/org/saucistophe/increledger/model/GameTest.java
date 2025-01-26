@@ -6,8 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.saucistophe.increledger.model.occupations.Occupation;
-import org.saucistophe.increledger.model.resources.Resource;
 
 class GameTest {
 
@@ -17,8 +15,8 @@ class GameTest {
     Game game = new Game();
     game.setPopulation(1234L);
     game.setTimestamp(1234L);
-    game.getOccupations().put(Occupation.WOOD_CUTTER, 12L);
-    game.getResources().put(Resource.WOOD, 1234.);
+    game.getOccupations().put("woodCutter", 12L);
+    game.getResources().put("wood", 1234.);
     assertEquals(
         """
     {
@@ -56,6 +54,6 @@ class GameTest {
             Game.class);
 
     assertEquals(1234L, game.getPopulation());
-    assertEquals(Map.of(Occupation.WOOD_CUTTER, 12L), game.getOccupations());
+    assertEquals(Map.of("woodCutter", 12L), game.getOccupations());
   }
 }

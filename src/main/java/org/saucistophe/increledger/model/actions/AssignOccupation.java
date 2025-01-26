@@ -4,14 +4,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.occupations.Occupation;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class AssignOccupation implements Action {
 
-  Occupation occupation;
+  String occupation;
   Long numbersOfAssignees;
 
   @Override

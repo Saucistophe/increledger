@@ -1,9 +1,7 @@
 package org.saucistophe.increledger.logic;
 
 import io.quarkus.logging.Log;
-import io.quarkus.runtime.StartupEvent;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.event.Observes;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.io.IOException;
@@ -13,15 +11,14 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.*;
 import java.util.Base64;
+import lombok.RequiredArgsConstructor;
 
+@RequiredArgsConstructor
 @ApplicationScoped
 public class CryptoService {
 
-  private KeyPair keyPair;
-
-  void startup(@Observes StartupEvent event) {
-    loadKeys();
-  }
+  private final PrivateKey privateKey;
+  private final PublicKey publicKey;
 
   private static void saveKeyToPEM(String fileName, String header, String footer, byte[] key) {
     String base64Key = Base64.getEncoder().encodeToString(key);
@@ -34,74 +31,32 @@ public class CryptoService {
     }
   }
 
-  private static PrivateKey loadPrivateKey() {
-    try {
-      String pem = new String(Files.readAllBytes(Paths.get("private_key.pem")));
-
-      String base64Key =
-          pem.replace("-----BEGIN PRIVATE KEY-----", "")
-              .replace("-----END PRIVATE KEY-----", "")
-              .replaceAll("\\s", ""); // Remove headers, footers, and newlines
-      byte[] keyBytes = Base64.getDecoder().decode(base64Key);
-      PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(keyBytes);
-      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-      return keyFactory.generatePrivate(keySpec);
-    } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-      Log.error("Could not load key from PEM file", e);
-      throw new InternalServerErrorException(e);
-    }
-  }
-
-  private static PublicKey loadPublicKey() {
-    try {
-      String pem = new String(Files.readAllBytes(Paths.get("public_key.pem")));
-
-      String base64Key =
-          pem.replace("-----BEGIN PUBLIC KEY-----", "")
-              .replace("-----END PUBLIC KEY-----", "")
-              .replaceAll("\\s", ""); // Remove headers, footers, and newlines
-      byte[] keyBytes = Base64.getDecoder().decode(base64Key);
-      X509EncodedKeySpec keySpec = new X509EncodedKeySpec(keyBytes);
-      KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-      return keyFactory.generatePublic(keySpec);
-    } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-      Log.error("Could not load key from PEM file", e);
-      throw new InternalServerErrorException(e);
-    }
-  }
-
   public void generateRSAKeyPair() {
     try {
       var kpGen = KeyPairGenerator.getInstance("RSA");
       kpGen.initialize(new RSAKeyGenParameterSpec(4096, RSAKeyGenParameterSpec.F4));
-      keyPair = kpGen.generateKeyPair();
+      var keyPair = kpGen.generateKeyPair();
+
+      saveKeyToPEM(
+          "private_key.pem",
+          "-----BEGIN PRIVATE KEY-----",
+          "-----END PRIVATE KEY-----",
+          keyPair.getPrivate().getEncoded());
+      saveKeyToPEM(
+          "public_key.pem",
+          "-----BEGIN PUBLIC KEY-----",
+          "-----END PUBLIC KEY-----",
+          keyPair.getPublic().getEncoded());
     } catch (NoSuchAlgorithmException | InvalidAlgorithmParameterException e) {
       Log.error("Could not generate key pair", e);
       throw new InternalServerErrorException(e);
     }
   }
 
-  public void storeKeys() {
-    saveKeyToPEM(
-        "private_key.pem",
-        "-----BEGIN PRIVATE KEY-----",
-        "-----END PRIVATE KEY-----",
-        keyPair.getPrivate().getEncoded());
-    saveKeyToPEM(
-        "public_key.pem",
-        "-----BEGIN PUBLIC KEY-----",
-        "-----END PUBLIC KEY-----",
-        keyPair.getPublic().getEncoded());
-  }
-
-  public void loadKeys() {
-    keyPair = new KeyPair(loadPublicKey(), loadPrivateKey());
-  }
-
   public boolean verify(String originalData, String signature) {
     try {
       Signature sig = Signature.getInstance("SHA512withRSA");
-      sig.initVerify(keyPair.getPublic());
+      sig.initVerify(publicKey);
       sig.update(originalData.getBytes(StandardCharsets.UTF_8));
 
       return sig.verify(Base64.getDecoder().decode(signature));
@@ -116,7 +71,7 @@ public class CryptoService {
 
     try {
       var sig = Signature.getInstance("SHA512withRSA");
-      sig.initSign(keyPair.getPrivate());
+      sig.initSign(privateKey);
       sig.update(data);
       return Base64.getEncoder().encodeToString(sig.sign());
     } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {

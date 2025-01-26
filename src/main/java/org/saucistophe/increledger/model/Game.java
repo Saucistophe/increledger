@@ -4,9 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.Instant;
 import java.util.*;
 import lombok.Data;
-import org.saucistophe.increledger.model.occupations.Occupation;
-import org.saucistophe.increledger.model.resources.Resource;
-import org.saucistophe.increledger.model.tech.Tech;
 
 @Data
 public class Game {
@@ -14,9 +11,9 @@ public class Game {
   private long maxPopulation = 5;
   private long population = 2;
 
-  private Map<Occupation, Long> occupations = new EnumMap<>(Occupation.class);
-  private Map<Resource, Double> resources = new EnumMap<>(Resource.class);
-  private List<Tech> techs = new ArrayList<>();
+  private Map<String, Long> occupations = new HashMap<>();
+  private Map<String, Double> resources = new HashMap<>();
+  // private List<Tech> techs = new ArrayList<>();
 
   private Long timestamp = Instant.now().toEpochMilli();
 
@@ -29,13 +26,13 @@ public class Game {
     return population - occupations.values().stream().mapToLong(Long::longValue).sum();
   }
 
-  public void spendResources(Map<Resource, Long> resourcesToSpend) {
+  public void spendResources(Map<String, Long> resourcesToSpend) {
     for (var entry : resourcesToSpend.entrySet()) {
       resources.put(entry.getKey(), resources.get(entry.getKey()) - entry.getValue());
     }
   }
 
-  public boolean hasResources(Map<Resource, Long> requirements) {
+  public boolean hasResources(Map<String, Long> requirements) {
     for (var entry : requirements.entrySet()) {
       if (!resources.containsKey(entry.getKey())) return false;
       if (resources.get(entry.getKey()) < entry.getValue()) return false;
