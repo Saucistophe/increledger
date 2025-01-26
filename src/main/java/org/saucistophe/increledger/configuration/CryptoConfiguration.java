@@ -1,8 +1,8 @@
 package org.saucistophe.increledger.configuration;
 
 import io.quarkus.logging.Log;
+import io.quarkus.runtime.configuration.ConfigurationException;
 import jakarta.inject.Singleton;
-import jakarta.ws.rs.InternalServerErrorException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,7 +29,7 @@ public class CryptoConfiguration {
       return keyFactory.generatePrivate(keySpec);
     } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
       Log.error("Could not load key from PEM file", e);
-      throw new InternalServerErrorException(e);
+      throw new ConfigurationException(e);
     }
   }
 
@@ -48,7 +48,7 @@ public class CryptoConfiguration {
       return keyFactory.generatePublic(keySpec);
     } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
       Log.error("Could not load key from PEM file", e);
-      throw new InternalServerErrorException(e);
+      throw new ConfigurationException(e);
     }
   }
 }

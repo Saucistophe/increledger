@@ -33,3 +33,4 @@ build/
 /in.json
 /public_key.pem
 /private_key.pem
+/rules.json
