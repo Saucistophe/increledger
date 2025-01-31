@@ -1,6 +1,8 @@
 package org.saucistophe.increledger.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
 import lombok.Data;
@@ -8,14 +10,17 @@ import lombok.Data;
 @Data
 public class Game {
 
+  @Min(1)
   private long maxPopulation = 5;
+
+  @Min(0)
   private long population = 2;
 
   private Map<String, Long> occupations = new HashMap<>();
   private Map<String, Double> resources = new HashMap<>();
-  // private List<Tech> techs = new ArrayList<>();
+  private List<String> techs = new ArrayList<>();
 
-  private Long timestamp = Instant.now().toEpochMilli();
+  @NotNull private Long timestamp = Instant.now().toEpochMilli();
 
   public void updateTimestamp() {
     timestamp = Instant.now().toEpochMilli();

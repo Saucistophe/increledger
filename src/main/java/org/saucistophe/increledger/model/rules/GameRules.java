@@ -1,7 +1,9 @@
-package org.saucistophe.increledger.model.dto;
+package org.saucistophe.increledger.model.rules;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.quarkus.logging.Log;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.util.List;
 import lombok.Data;
@@ -9,8 +11,9 @@ import lombok.Data;
 @Data
 public class GameRules {
 
-  private List<String> resources;
-  private List<Occupation> occupations;
+  @NotEmpty @Valid private List<Resource> resources;
+  @Valid private List<Occupation> occupations;
+  @Valid private List<Tech> techs;
 
   @JsonIgnore
   public Occupation getOccupationById(String id) {

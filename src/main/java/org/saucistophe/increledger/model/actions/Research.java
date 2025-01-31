@@ -1,9 +1,10 @@
 package org.saucistophe.increledger.model.actions;
 
-import io.quarkus.logging.Log;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.saucistophe.increledger.logic.ActionsVisitor;
 import org.saucistophe.increledger.model.Game;
 
 @NoArgsConstructor
@@ -11,31 +12,15 @@ import org.saucistophe.increledger.model.Game;
 @Data
 public class Research implements Action {
 
-  String tech;
+  @NotBlank String tech;
 
   @Override
-  public boolean isValid(Game game) {
-    if (tech == null) {
-      Log.info("No tech provided");
-      return false;
-    }
-    // TODO
-    if (false) {
-      Log.info("Tech already researched");
-      return false;
-    }
-    // TODO
-    if (false) {
-      Log.info("Not enough resources");
-      return false;
-    }
-    return true;
+  public boolean acceptValidation(ActionsVisitor visitor, Game game) {
+    return visitor.isValid(this, game);
   }
 
   @Override
-  public void execute(Game game) {
-    // TODO
-    // game.spendResources(tech.requirements());
-    // game.getTechs().add(tech);
+  public void acceptExecution(ActionsVisitor visitor, Game game) {
+    visitor.execute(this, game);
   }
 }
