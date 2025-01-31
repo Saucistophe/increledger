@@ -1,0 +1,27 @@
+# $schema: ./src/main/resources/schemas/GameRules-schema.json
+---
+resources:
+  - name: wood
+    initialCap: 50
+  - name: food
+    initialCap: 50
+  - name: stone
+    initialCap: 50
+  - name: knowledge
+    initialCap: 100
+occupations:
+  - name: woodcutter
+    unlocked: true
+    resourcesProduced:
+      wood: 1
+  - name: quarry_worker
+    resourcesProduced:
+      stone: 0.1
+techs:
+  - name: quarry_workers
+    cost:
+      knowledge: 50
+    effects:
+      - type: .UnlockOccupation
+        occupation: quarry_worker
+    prerequisiteTechs:

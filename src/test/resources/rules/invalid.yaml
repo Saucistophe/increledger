@@ -1,0 +1,39 @@
+# $schema: ./src/main/resources/schemas/GameRules-schema.json
+---
+resources:
+  # Missing name
+  - initialCap: 50
+  - name: ""
+    initialCap: 50
+  # Missing cap
+  - name: food
+  # Invalid cap
+  - name: maaan
+    initialCap: -1
+occupations:
+  # Missing name
+  - unlocked: true
+    resourcesProduced:
+      wood: 1
+  - name: ""
+    unlocked: true
+    resourcesProduced:
+      wood: 1
+  # No resources is OK
+  - name: quarry_worker
+techs:
+  # Missing name
+  - cost:
+      knowledge: 50
+    effects:
+      - type: .UnlockOccupation
+        occupation: quarry_worker
+    prerequisiteTechs:
+  # Missing type and bugged type hard-crash the serialization and are not tested.
+  # Missing occupation
+  - name: quarry_workers
+    cost:
+      knowledge: 50
+    effects:
+      - type: .UnlockOccupation
+    prerequisiteTechs:
