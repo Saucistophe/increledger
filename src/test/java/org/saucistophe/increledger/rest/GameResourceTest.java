@@ -1,26 +1,25 @@
 package org.saucistophe.increledger.rest;
 
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.quarkus.test.junit.QuarkusTest;
-import jakarta.inject.Inject;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-
+import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
-import org.saucistophe.increledger.logic.GameService;
+import org.saucistophe.increledger.model.GameDto;
 import org.saucistophe.increledger.model.actions.AssignOccupation;
 
 @QuarkusTest
 class GameResourceTest {
 
-  @Inject GameService gameService;
-
   @Test
   void getNewGame() {
-    var gameDto = gameService.newGame();
+    var gameDto = given().when().get("/game").then().statusCode(200).extract().as(GameDto.class);
+
     assertEquals("Dummy Signature", gameDto.getSignature());
     assertEquals(List.of(), gameDto.getActions());
     assertEquals(5, gameDto.getGame().getMaxPopulation());
@@ -30,37 +29,95 @@ class GameResourceTest {
 
   @Test
   void processGame() {
-    var gameDto = gameService.newGame();
+    var gameDto = given().when().get("/game").then().statusCode(200).extract().as(GameDto.class);
     gameDto.getActions().add(new AssignOccupation("woodcutter", 1L));
-    gameDto = gameService.process(gameDto);
+    gameDto =
+        given()
+            .header("Content-type", "application/json")
+            .and()
+            .body(gameDto)
+            .when()
+            .post("/game")
+            .then()
+            .statusCode(200)
+            .extract()
+            .as(GameDto.class);
+
     // Production not yet started
     assertFalse(gameDto.getGame().getResources().containsKey("wood"));
 
-    CompletableFuture.runAsync(() -> {}, CompletableFuture.delayedExecutor(100, TimeUnit.MILLISECONDS)).join();
-    gameDto = gameService.process(gameDto);
+    CompletableFuture.runAsync(
+            () -> {}, CompletableFuture.delayedExecutor(100, TimeUnit.MILLISECONDS))
+        .join();
+    gameDto =
+        given()
+            .header("Content-type", "application/json")
+            .and()
+            .body(gameDto)
+            .when()
+            .post("/game")
+            .then()
+            .statusCode(200)
+            .extract()
+            .as(GameDto.class);
     var currentWood = gameDto.getGame().getResources().get("wood");
     assertTrue(currentWood > 0.);
   }
 
   @Test
   void getProduction() {
-    var gameDto = gameService.newGame();
-    assertEquals(Map.of(), gameService.getCurrentProduction(gameDto.getGame()));
 
+    var gameDto = given().when().get("/game").then().statusCode(200).extract().as(GameDto.class);
     gameDto.getActions().add(new AssignOccupation("woodcutter", 1L));
-    gameDto = gameService.process(gameDto);
-    assertEquals(Map.of("wood", 1.), gameService.getCurrentProduction(gameDto.getGame()));
+    gameDto =
+        given()
+            .header("Content-type", "application/json")
+            .and()
+            .body(gameDto)
+            .when()
+            .post("/game")
+            .then()
+            .statusCode(200)
+            .extract()
+            .as(GameDto.class);
+
+    given()
+        .header("Content-type", "application/json")
+        .and()
+        .body(gameDto)
+        .when()
+        .post("/game/production")
+        .then()
+        .statusCode(200)
+        .body("wood", CoreMatchers.equalTo(1f));
   }
 
   @Test
   void getAvailableOccupations() {
-    var gameDto = gameService.newGame();
-    assertEquals(List.of("woodcutter"), gameService.getAvailableOccupations(gameDto.getGame()));
+    var gameDto = given().when().get("/game").then().statusCode(200).extract().as(GameDto.class);
+    given()
+        .header("Content-type", "application/json")
+        .and()
+        .body(gameDto)
+        .when()
+        .post("/game/occupations")
+        .then()
+        .statusCode(200)
+        .body("$", hasSize(1))
+        .body("$", hasItem("woodcutter"));
 
     gameDto.getGame().getTechs().add("quarry_workers");
 
-    assertEquals(
-        List.of("woodcutter", "quarry_worker"),
-        gameService.getAvailableOccupations(gameDto.getGame()));
+    given()
+        .header("Content-type", "application/json")
+        .and()
+        .body(gameDto)
+        .when()
+        .post("/game/occupations")
+        .then()
+        .statusCode(200)
+        .body("$", hasSize(2))
+        .body("$", hasItem("woodcutter"))
+        .body("$", hasItem("quarry_worker"));
   }
 }
