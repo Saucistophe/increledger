@@ -16,18 +16,26 @@ public class ActionsVisitor {
   private final GameService gameService;
 
   public boolean isValid(Research research, Game game) {
-    var tech = research.getTech();
-    if (tech == null) {
+    var techName = research.getTech();
+    if (techName == null) {
       Log.info("No tech provided");
       return false;
     }
-    // TODO
-    if (false) {
+
+    if (game.getTechs().contains(techName)) {
       Log.info("Tech already researched");
       return false;
     }
-    // TODO
-    if (false) {
+
+    var techOptional =
+      gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
+
+    if (techOptional.isEmpty()) {
+      Log.info("Tech " + techName + " not found in the game's rules");
+      return false;
+    }
+
+    if (!game.hasResources(techOptional.get().getCost())) {
       Log.info("Not enough resources");
       return false;
     }
@@ -35,7 +43,11 @@ public class ActionsVisitor {
   }
 
   public void execute(Research research, Game game) {
-    // TODO
+    var techName = research.getTech();
+    var techOptional =
+      gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
+
+    game.spendResources(techOptional.get().getCost());
   }
 
   public boolean isValid(AssignOccupation assignOccupation, Game game) {

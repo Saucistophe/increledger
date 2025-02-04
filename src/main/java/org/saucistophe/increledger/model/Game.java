@@ -31,13 +31,13 @@ public class Game {
     return population - occupations.values().stream().mapToLong(Long::longValue).sum();
   }
 
-  public void spendResources(Map<String, Long> resourcesToSpend) {
+  public void spendResources(Map<String, Double> resourcesToSpend) {
     for (var entry : resourcesToSpend.entrySet()) {
       resources.put(entry.getKey(), resources.get(entry.getKey()) - entry.getValue());
     }
   }
 
-  public boolean hasResources(Map<String, Long> requirements) {
+  public boolean hasResources(Map<String, Double> requirements) {
     for (var entry : requirements.entrySet()) {
       if (!resources.containsKey(entry.getKey())) return false;
       if (resources.get(entry.getKey()) < entry.getValue()) return false;
