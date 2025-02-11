@@ -44,11 +44,15 @@ jobs:
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
 
-    - name: Code Coverage Report
-      uses: irongut/CodeCoverageSummary@v1.3.0
+    - name: Jacoco Report to PR
+      id: jacoco
+      uses: madrapps/jacoco-report@v1.7.1
       with:
-        filename: target/jacoco-report/jacoco.xml
-        badge: true
-        format: markdown
-        indicators: true
-        output: both
+        paths: ${{ github.workspace }}/target/jacoco-report/jacoco.xml
+        token: ${{ secrets.GITHUB_TOKEN }}
+        min-coverage-overall: 40
+        min-coverage-changed-files: 60
+        update-comment: true
+        title: '# :books: Coverage Report'
+        pass-emoji: ':green_book:'
+        fail-emoji: ':closed_book:'
