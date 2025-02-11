@@ -11,15 +11,15 @@ import jakarta.validation.Validator;
 import jakarta.ws.rs.Produces;
 import java.io.File;
 import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.saucistophe.increledger.model.rules.GameRules;
 
+@RequiredArgsConstructor
 public class RulesConfiguration {
 
-  String rulesPath;
-  public RulesConfiguration(@ConfigProperty(name = "rules.path") String rulesPath) {
-    this .rulesPath = rulesPath;
-  }
+  @ConfigProperty(name = "rules.path")
+  final String rulesPath;
 
   @Startup
   @ApplicationScoped
