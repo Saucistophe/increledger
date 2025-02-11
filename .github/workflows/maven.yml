@@ -44,15 +44,21 @@ jobs:
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
 
-    - name: Jacoco Report to PR
+    - name: Generate JaCoCo Badge
       id: jacoco
-      uses: madrapps/jacoco-report@v1.7.1
+      uses: cicirello/jacoco-badge-generator@v2
       with:
-        paths: ${{ github.workspace }}/target/jacoco-report/jacoco.xml
-        token: ${{ secrets.GITHUB_TOKEN }}
-        min-coverage-overall: 40
-        min-coverage-changed-files: 60
-        update-comment: true
-        title: '# :books: Coverage Report'
-        pass-emoji: ':green_book:'
-        fail-emoji: ':closed_book:'
+        jacoco-csv-file: target/jacoco-report/jacoco.csv
+        generate-branches-badge: true
+
+    - name: Log coverage percentage
+      run: |
+        echo "coverage = ${{ steps.jacoco.outputs.coverage }}"
+        echo "branch coverage = ${{ steps.jacoco.outputs.branches }}"
+
+    - name: Commit and push the badge (if it changed)
+      uses: EndBug/add-and-commit@v7
+      with:
+        default_author: github_actions
+        message: 'commit badge'
+        add: '*.svg'
