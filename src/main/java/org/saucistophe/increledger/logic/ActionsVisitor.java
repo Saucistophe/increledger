@@ -13,7 +13,7 @@ import org.saucistophe.increledger.model.rules.GameRules;
 public class ActionsVisitor {
 
   private final GameRules gameRules;
-  private final GameService gameService;
+  private final GameComputingService gameService;
 
   public boolean isValid(Research research, Game game) {
     var techName = research.getTech();
@@ -22,7 +22,7 @@ public class ActionsVisitor {
       return false;
     }
 
-    if (game.getTechs().contains(techName)) {
+    if (game.getTechs().containsKey(techName)) {
       Log.info("Tech already researched");
       return false;
     }

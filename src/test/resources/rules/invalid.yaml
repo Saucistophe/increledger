@@ -1,5 +1,12 @@
 # $schema: ../../../../target/schemas/GameRules-schema.json
 ---
+populations:
+  # Invalid count
+  - name: people
+    initialCount: -1
+  # Invalid cap
+  - name: soldiers
+    initialCap: -1
 resources:
   # Missing name
   - initialCap: 50

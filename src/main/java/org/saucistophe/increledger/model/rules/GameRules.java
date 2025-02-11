@@ -12,18 +12,56 @@ import lombok.Data;
 public class GameRules {
 
   @NotEmpty @Valid private List<Resource> resources;
-  @Valid private List<Occupation> occupations;
-  @Valid private List<Tech> techs;
+  @NotEmpty @Valid private List<Population> populations;
+  @NotEmpty @Valid private List<Occupation> occupations;
+  @NotEmpty @Valid private List<Tech> techs;
+
+  private static InternalServerErrorException logIdNotFound(String target, String id) {
+    Log.info(target + " with id " + id + " not found");
+    return new InternalServerErrorException("Resource with id " + id + " not found");
+  }
+
+  @JsonIgnore
+  public Resource getResourceById(String id) {
+    var resourceOptional = resources.stream().filter(o -> o.getName().equals(id)).findFirst();
+
+    if (resourceOptional.isEmpty()) {
+      throw logIdNotFound("Resource", id);
+    } else {
+      return resourceOptional.get();
+    }
+  }
+
+  @JsonIgnore
+  public Population getPopulationById(String id) {
+    var populationOptional = populations.stream().filter(o -> o.getName().equals(id)).findFirst();
+
+    if (populationOptional.isEmpty()) {
+      throw logIdNotFound("Population", id);
+    } else {
+      return populationOptional.get();
+    }
+  }
 
   @JsonIgnore
   public Occupation getOccupationById(String id) {
     var occupationOptional = occupations.stream().filter(o -> o.getName().equals(id)).findFirst();
 
     if (occupationOptional.isEmpty()) {
-      Log.error("Occupation with id " + id + " not found");
-      throw new InternalServerErrorException("Occupation with id " + id + " not found");
+      throw logIdNotFound("Occupation", id);
     } else {
       return occupationOptional.get();
+    }
+  }
+
+  @JsonIgnore
+  public Tech getTechById(String id) {
+    var techOptional = techs.stream().filter(o -> o.getName().equals(id)).findFirst();
+
+    if (techOptional.isEmpty()) {
+      throw logIdNotFound("Tech", id);
+    } else {
+      return techOptional.get();
     }
   }
 }
