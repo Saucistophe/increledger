@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class IncreasePopulation implements Effect {
+public class IncreaseCap implements Effect {
 
   @Min(1)
   long amount;

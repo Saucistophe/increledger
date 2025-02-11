@@ -20,12 +20,16 @@ resources:
 occupations:
   # Missing name
   - unlocked: true
-    resourcesProduced:
-      wood: 1
+    effects:
+      - type: .RawProduction
+        resource: wood
+        amount: 1
   - name: ""
     unlocked: true
-    resourcesProduced:
-      wood: 1
+    effects:
+      - type: .RawProduction
+        resource: stone
+        amount: 1
   # No resources is OK
   - name: quarry_worker
 techs:
@@ -35,7 +39,7 @@ techs:
     effects:
       - type: .UnlockOccupation
         occupation: quarry_worker
-    prerequisiteTechs:
+    prerequisiteTechs: []
   # Missing type and bugged type hard-crash the serialization and are not tested.
   # Missing occupation
   - name: quarry_workers
@@ -43,4 +47,4 @@ techs:
       knowledge: 50
     effects:
       - type: .UnlockOccupation
-    prerequisiteTechs:
+    prerequisiteTechs: []

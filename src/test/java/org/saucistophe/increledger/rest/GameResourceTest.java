@@ -22,8 +22,7 @@ class GameResourceTest {
 
     assertEquals("Dummy Signature", gameDto.getSignature());
     assertEquals(List.of(), gameDto.getActions());
-    assertEquals(5, gameDto.getGame().getMaxPopulation());
-    assertEquals(2, gameDto.getGame().getPopulation());
+    assertEquals(2, gameDto.getGame().getPopulations().get("people"));
     assertTrue(gameDto.getGame().getTimestamp() > 1738364824582L);
   }
 
@@ -106,7 +105,7 @@ class GameResourceTest {
         .body("$", hasSize(1))
         .body("$", hasItem("woodcutter"));
 
-    gameDto.getGame().getTechs().add("quarry_workers");
+    gameDto.getGame().getTechs().put("quarry_workers",1L);
 
     given()
         .header("Content-type", "application/json")

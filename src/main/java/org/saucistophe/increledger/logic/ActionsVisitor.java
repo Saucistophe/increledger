@@ -2,6 +2,7 @@ package org.saucistophe.increledger.logic;
 
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.InternalServerErrorException;
 import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.actions.AssignOccupation;
@@ -28,7 +29,7 @@ public class ActionsVisitor {
     }
 
     var techOptional =
-      gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
+        gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
 
     if (techOptional.isEmpty()) {
       Log.info("Tech " + techName + " not found in the game's rules");
@@ -45,24 +46,27 @@ public class ActionsVisitor {
   public void execute(Research research, Game game) {
     var techName = research.getTech();
     var techOptional =
-      gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
-
+        gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
+    if (techOptional.isEmpty())
+      throw new InternalServerErrorException("Tech " + techName + " not found in the game's rules");
     game.spendResources(techOptional.get().getCost());
   }
 
   public boolean isValid(AssignOccupation assignOccupation, Game game) {
-    var occupation = assignOccupation.getOccupation();
+    var occupationId = assignOccupation.getOccupation();
     var numbersOfAssignees = assignOccupation.getNumbersOfAssignees();
 
-    if (occupation == null) {
+    if (occupationId == null) {
       Log.error("Occupation is null in assignment");
       return false;
     }
-    if (gameRules.getOccupationById(occupation) == null) {
-      Log.error("Occupation " + occupation + " not found in game's rules");
+    var occupation = gameRules.getOccupationById(occupationId);
+    if (occupation == null) {
+      Log.error("Occupation " + occupationId + " not found in game's rules");
       return false;
     }
-    if (numbersOfAssignees < 1 || numbersOfAssignees > game.getFreePopulation()) {
+    var freePopulations = gameService.getFreePopulations(game);
+    if (numbersOfAssignees < 1 || numbersOfAssignees > freePopulations.get(occupation.getPopulation())) {
       Log.error("Invalid number for assigment: " + numbersOfAssignees);
       return false;
     }

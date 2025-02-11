@@ -9,14 +9,14 @@ import jakarta.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
 import lombok.AllArgsConstructor;
-import org.saucistophe.increledger.logic.GameComputingService;
+import org.saucistophe.increledger.logic.GameService;
 import org.saucistophe.increledger.model.GameDto;
 
 @Path("/game")
 @AllArgsConstructor
 public class GameResource {
 
-  GameComputingService gameService;
+  GameService gameService;
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)

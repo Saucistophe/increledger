@@ -1,5 +1,9 @@
 # $schema: ../../../../target/schemas/GameRules-schema.json
 ---
+populations:
+  - name: people
+    initialCount: 2
+    initialCap: 5
 resources:
   - name: wood
     initialCap: 50
@@ -11,12 +15,18 @@ resources:
     initialCap: 100
 occupations:
   - name: woodcutter
+    population: people
     unlocked: true
-    resourcesProduced:
-      wood: 1
+    effects:
+      - type: .RawProduction
+        resource: wood
+        amount: 1
   - name: quarry_worker
-    resourcesProduced:
-      stone: 0.1
+    population: people
+    effects:
+      - type: .RawProduction
+        resource: stone
+        amount: 1
 techs:
   - name: quarry_workers
     cost:
@@ -24,4 +34,4 @@ techs:
     effects:
       - type: .UnlockOccupation
         occupation: quarry_worker
-    prerequisiteTechs:
+    prerequisiteTechs: []
