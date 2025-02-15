@@ -16,7 +16,7 @@ public class AssignOccupation implements Action {
   @NotBlank String occupation;
 
   @Min(1)
-  Long numbersOfAssignees;
+  long numbersOfAssignees;
 
   @Override
   public boolean acceptValidation(ActionsVisitor visitor, Game game) {

@@ -41,6 +41,7 @@ public class RulesConfiguration {
       throw new ConstraintViolationException(violations);
     }
     // TODO look for cycles in tech boosts
+    // TODO ensure nothing boosts the caps of something with cap -1
 
     return gameRules;
   }

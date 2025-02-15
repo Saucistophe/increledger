@@ -14,4 +14,6 @@ public class GameDto {
   @NotBlank private String signature;
 
   private List<Action> actions = new ArrayList<>();
+
+  private GameDescription gameDescription;
 }

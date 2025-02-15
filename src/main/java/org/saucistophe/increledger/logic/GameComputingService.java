@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Stream;
+
 import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.effects.*;
-import org.saucistophe.increledger.model.rules.GameRules;
-import org.saucistophe.increledger.model.rules.NamedEntityWithEffects;
-import org.saucistophe.increledger.model.rules.Population;
+import org.saucistophe.increledger.model.rules.*;
 
 /** Service used only for presenting the game's state in a more computing-friendly manner. */
 @RequiredArgsConstructor
@@ -45,6 +45,30 @@ public class GameComputingService {
 
     return result;
   }
+
+
+  public Map<String, Double> getResourcesCaps(Game game) {
+
+    Map<String, Double> caps = new HashMap<>();
+
+    for (var resource : gameRules.getResources()) {
+      caps.put(resource.getName(), resource.getInitialCap());
+    }
+
+    var capIncreases =
+      getEffectsFromEntities(game.getTechs(), gameRules::getTechById, IncreaseCap.class);
+    capIncreases.addAll(
+      getEffectsFromEntities(
+        game.getOccupations(), gameRules::getOccupationById, IncreaseCap.class));
+    for (var capIncrease : capIncreases) {
+      caps.computeIfPresent(
+        capIncrease.effect.getTarget(),
+        (k, v) -> v + capIncrease.count * capIncrease.effect.getAmount());
+    }
+
+    return caps;
+  }
+
 
   public Map<String, Long> getPopulationCaps(Game game) {
 
@@ -106,7 +130,7 @@ public class GameComputingService {
       var occupation = gameRules.getOccupationById(occupationName);
 
       result.computeIfPresent(
-          occupationName, (k, v) -> v - occupation.getAmountNeeded() * gameOccupation.getValue());
+          occupationName, (k, v) -> v - occupation.getPopulationNeeded() * gameOccupation.getValue());
     }
     return result;
   }
@@ -155,5 +179,15 @@ public class GameComputingService {
     }
 
     return result;
+  }
+
+  public List<String> getAvailableOccupations(Game game) {
+    var unlockedInitially =
+        gameRules.getOccupations().stream().filter(Occupation::isUnlocked).map(Occupation::getName);
+    var unlockedThroughTech =
+        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, UnlockOccupation.class)
+            .stream()
+            .map(r -> r.effect.getOccupation());
+    return Stream.concat(unlockedInitially, unlockedThroughTech).distinct().toList();
   }
 }

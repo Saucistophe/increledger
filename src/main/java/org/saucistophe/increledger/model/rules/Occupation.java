@@ -9,7 +9,8 @@ import lombok.EqualsAndHashCode;
 @Data
 public class Occupation extends NamedEntityWithEffects{
   @NotBlank private String population;
-  @Min(1) private long amountNeeded = 1;
+  @Min(1) private long populationNeeded = 1;
   private boolean unlocked = false;
-  
+  @Min(-1)
+  private long cap = -1; // A cap of -1 means unlimited
 }

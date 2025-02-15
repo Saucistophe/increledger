@@ -13,9 +13,11 @@ import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.saucistophe.increledger.model.Game;
+import org.saucistophe.increledger.model.GameDescription;
 import org.saucistophe.increledger.model.GameDto;
 import org.saucistophe.increledger.model.effects.UnlockOccupation;
 import org.saucistophe.increledger.model.rules.GameRules;
@@ -50,30 +52,40 @@ public class GameService extends GameComputingService {
     resultGameDto.setGame(game);
     resultGameDto.setSignature(cryptoService.sign(toJson(game)));
 
+    resultGameDto.setGameDescription(getDescription(game));
+
     return resultGameDto;
   }
 
-  // TODO revamp with effects?
-  public List<String> getAvailableOccupations(Game game) {
-    var unlockedInitially =
-        gameRules.getOccupations().stream()
-            .filter(Occupation::isUnlocked)
-            .map(Occupation::getName)
-            .toList();
-    var unlockedThroughTech =
-        game.getTechs().keySet().stream()
-            .map(
-                t ->
-                    gameRules.getTechs().stream()
-                        .filter(ct -> ct.getName().equals(t))
-                        .findFirst()
-                        .orElseThrow())
-            .flatMap(t -> t.getEffects().stream())
-            .filter(UnlockOccupation.class::isInstance)
-            .map(UnlockOccupation.class::cast)
-            .map(UnlockOccupation::getOccupation)
-            .toList();
-    return Stream.concat(unlockedInitially.stream(), unlockedThroughTech.stream()).toList();
+  public GameDescription getDescription(Game game) {
+    var result = new GameDescription();
+
+    // Keep only resources with actual production, or more than 0 resource.
+    var production = getCurrentProduction(game);
+    var resourcesNames =
+        game.getResources().entrySet().stream()
+            .filter(e -> e.getValue() > 0)
+            .map(Map.Entry::getKey);
+    var productedResourcesNames = production.keySet().stream();
+    var relevantResources =
+        Stream.concat(resourcesNames, productedResourcesNames).distinct().toList();
+
+    result.setResources(new ArrayList<>());
+    var caps = this.getResourcesCaps(game);
+    for (var resource : gameRules.getResources()) {
+      if (relevantResources.contains(resource.getName())) {
+        result
+            .getResources()
+            .add(
+                new GameDescription.ResourceDto(
+                    resource.getName(),
+                    game.getResources().get(resource.getName()),
+                    caps.get(resource.getName()),
+                    production.get(resource.getName())));
+      }
+    }
+
+    return result;
   }
 
   public GameDto process(GameDto gameDto) {
@@ -96,14 +108,15 @@ public class GameService extends GameComputingService {
     }
 
     // First pass the time
+    var resourceCaps = getResourcesCaps(game);
     var production = getCurrentProduction(game);
     for (var producedResource : production.entrySet()) {
       var resource = producedResource.getKey();
       var amount = producedResource.getValue();
 
-      // TODO handle caps
       var existingAmount = game.getResources().getOrDefault(resource, 0.);
       var newAmount = existingAmount + amount * ellapsedMillis / 1000.;
+      newAmount = Math.min(newAmount, resourceCaps.get(resource));
       game.getResources().put(resource, newAmount);
     }
 
@@ -115,10 +128,17 @@ public class GameService extends GameComputingService {
       action.acceptExecution(actionsVisitor, game);
     }
 
+    // Fix the resources: If a production just started, you should still have the resource, even if
+    // just at zero.
+    production = getCurrentProduction(game);
+    for (var producedResource : production.keySet())
+      game.getResources().computeIfAbsent(producedResource, k -> 0.);
+
     // Sign the game
     var resultGameDto = new GameDto();
     resultGameDto.setGame(game);
     resultGameDto.setSignature(cryptoService.sign(toJson(game)));
+    resultGameDto.setGameDescription(getDescription(game));
 
     return resultGameDto;
   }
