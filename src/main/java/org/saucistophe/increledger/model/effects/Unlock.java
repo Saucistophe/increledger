@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class UnlockOccupation implements Effect {
+public class Unlock implements Effect {
 
-  @NotBlank String occupation;
+  @NotBlank String target;
 }

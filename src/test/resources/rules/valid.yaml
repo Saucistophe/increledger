@@ -29,9 +29,9 @@ occupations:
         amount: 1
 techs:
   - name: quarry_workers
+    unlocked: true
     cost:
       knowledge: 50
     effects:
-      - type: .UnlockOccupation
-        occupation: quarry_worker
-    prerequisiteTechs: []
+      - type: .Unlock
+        target: quarry_worker

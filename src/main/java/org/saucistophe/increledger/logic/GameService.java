@@ -12,17 +12,14 @@ import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.GameDescription;
 import org.saucistophe.increledger.model.GameDto;
-import org.saucistophe.increledger.model.effects.UnlockOccupation;
 import org.saucistophe.increledger.model.rules.GameRules;
 import org.saucistophe.increledger.model.rules.NamedEntity;
-import org.saucistophe.increledger.model.rules.Occupation;
 import org.saucistophe.increledger.model.rules.Population;
 
 @Singleton
@@ -66,12 +63,12 @@ public class GameService extends GameComputingService {
         game.getResources().entrySet().stream()
             .filter(e -> e.getValue() > 0)
             .map(Map.Entry::getKey);
-    var productedResourcesNames = production.keySet().stream();
+    var producedResourcesNames = production.keySet().stream();
     var relevantResources =
-        Stream.concat(resourcesNames, productedResourcesNames).distinct().toList();
+        Stream.concat(resourcesNames, producedResourcesNames).distinct().toList();
 
     result.setResources(new ArrayList<>());
-    var caps = this.getResourcesCaps(game);
+    var resourcesCaps = this.getResourcesCaps(game);
     for (var resource : gameRules.getResources()) {
       if (relevantResources.contains(resource.getName())) {
         result
@@ -80,9 +77,20 @@ public class GameService extends GameComputingService {
                 new GameDescription.ResourceDto(
                     resource.getName(),
                     game.getResources().get(resource.getName()),
-                    caps.get(resource.getName()),
-                    production.get(resource.getName())));
+                    resourcesCaps.get(resource.getName()),
+                    production.getOrDefault(resource.getName(), 0.)));
       }
+    }
+
+    result.setTechs(new ArrayList<>());
+    var techs = getAvailableTechs(game);
+    var techCaps = getTechCaps(game);
+    for (var tech : techs) {
+      result
+          .getTechs()
+          .add(
+              new GameDescription.TechDto(
+                  tech, game.getTechs().getOrDefault(tech, 0L), techCaps.get(tech)));
     }
 
     return result;

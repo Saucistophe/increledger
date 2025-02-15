@@ -25,11 +25,8 @@ public class GameComputingService {
     Map<String, Double> result = new HashMap<>();
 
     var boosts = getBoosts(game);
-    var rawProductions =
-        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, RawProduction.class);
-    rawProductions.addAll(
-        getEffectsFromEntities(
-            game.getOccupations(), gameRules::getOccupationById, RawProduction.class));
+
+    var rawProductions = getAllEffectsFromEntities(game, RawProduction.class);
 
     for (var production : rawProductions) {
       var resource = production.effect.getResource();
@@ -46,7 +43,6 @@ public class GameComputingService {
     return result;
   }
 
-
   public Map<String, Double> getResourcesCaps(Game game) {
 
     Map<String, Double> caps = new HashMap<>();
@@ -55,20 +51,33 @@ public class GameComputingService {
       caps.put(resource.getName(), resource.getInitialCap());
     }
 
-    var capIncreases =
-      getEffectsFromEntities(game.getTechs(), gameRules::getTechById, IncreaseCap.class);
-    capIncreases.addAll(
-      getEffectsFromEntities(
-        game.getOccupations(), gameRules::getOccupationById, IncreaseCap.class));
+    var capIncreases = getAllEffectsFromEntities(game, IncreaseCap.class);
     for (var capIncrease : capIncreases) {
       caps.computeIfPresent(
-        capIncrease.effect.getTarget(),
-        (k, v) -> v + capIncrease.count * capIncrease.effect.getAmount());
+          capIncrease.effect.getTarget(),
+          (k, v) -> v + capIncrease.count * capIncrease.effect.getAmount());
     }
 
     return caps;
   }
 
+  public Map<String, Long> getTechCaps(Game game) {
+
+    Map<String, Long> caps = new HashMap<>();
+
+    for (var tech : gameRules.getTechs()) {
+      caps.put(tech.getName(), tech.getInitialCap());
+    }
+
+    var capIncreases = getAllEffectsFromEntities(game, IncreaseCap.class);
+    for (var capIncrease : capIncreases) {
+      caps.computeIfPresent(
+          capIncrease.effect.getTarget(),
+          (k, v) -> v + capIncrease.count * capIncrease.effect.getAmount());
+    }
+
+    return caps;
+  }
 
   public Map<String, Long> getPopulationCaps(Game game) {
 
@@ -81,11 +90,7 @@ public class GameComputingService {
     // TODO handle separate boosts for caps and pop? Handle boosts here? Create a method that
     // retrieves boosted effects?
     // TODO Handle unlimited caps
-    var capIncreases =
-        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, IncreaseCap.class);
-    capIncreases.addAll(
-        getEffectsFromEntities(
-            game.getOccupations(), gameRules::getOccupationById, IncreaseCap.class));
+    var capIncreases = getAllEffectsFromEntities(game, IncreaseCap.class);
     for (var capIncrease : capIncreases) {
       caps.computeIfPresent(
           capIncrease.effect.getTarget(),
@@ -103,11 +108,7 @@ public class GameComputingService {
       result.put(population.getName(), population.getInitialCount());
     }
 
-    var populationIncreases =
-        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, IncreasePopulation.class);
-    populationIncreases.addAll(
-        getEffectsFromEntities(
-            game.getOccupations(), gameRules::getOccupationById, IncreasePopulation.class));
+    var populationIncreases = getAllEffectsFromEntities(game, IncreasePopulation.class);
     for (var populationIncrease : populationIncreases) {
       result.computeIfPresent(
           populationIncrease.effect.getTarget(),
@@ -130,7 +131,8 @@ public class GameComputingService {
       var occupation = gameRules.getOccupationById(occupationName);
 
       result.computeIfPresent(
-          occupationName, (k, v) -> v - occupation.getPopulationNeeded() * gameOccupation.getValue());
+          occupationName,
+          (k, v) -> v - occupation.getPopulationNeeded() * gameOccupation.getValue());
     }
     return result;
   }
@@ -139,11 +141,7 @@ public class GameComputingService {
     Map<String, Double> result = new HashMap<>();
 
     // Merge occupation and tech effects
-    var allEffects =
-        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, BoostProduction.class);
-    allEffects.addAll(
-        getEffectsFromEntities(
-            game.getOccupations(), gameRules::getOccupationById, BoostProduction.class));
+    var allEffects = getAllEffectsFromEntities(game, BoostProduction.class);
 
     while (!allEffects.isEmpty()) {
       // Find boosts that are not subject to other boosts
@@ -181,13 +179,36 @@ public class GameComputingService {
     return result;
   }
 
+  protected <T extends Effect> List<EffectRecord<T>> getAllEffectsFromEntities(
+      Game game, Class<T> targetClass) {
+    var allEffects = getEffectsFromEntities(game.getTechs(), gameRules::getTechById, targetClass);
+    allEffects.addAll(
+        getEffectsFromEntities(game.getOccupations(), gameRules::getOccupationById, targetClass));
+    return allEffects;
+  }
+
   public List<String> getAvailableOccupations(Game game) {
     var unlockedInitially =
         gameRules.getOccupations().stream().filter(Occupation::isUnlocked).map(Occupation::getName);
     var unlockedThroughTech =
-        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, UnlockOccupation.class)
-            .stream()
-            .map(r -> r.effect.getOccupation());
+        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
+            .map(r -> r.effect.getTarget())
+            .filter(
+                t ->
+                    gameRules.getOccupations().stream()
+                        .map(NamedEntity::getName)
+                        .anyMatch(t::equals));
+    return Stream.concat(unlockedInitially, unlockedThroughTech).distinct().toList();
+  }
+
+  public List<String> getAvailableTechs(Game game) {
+    var unlockedInitially =
+        gameRules.getTechs().stream().filter(Tech::isUnlocked).map(Tech::getName);
+    var unlockedThroughTech =
+        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
+            .map(r -> r.effect.getTarget())
+            .filter(
+                t -> gameRules.getTechs().stream().map(NamedEntity::getName).anyMatch(t::equals));
     return Stream.concat(unlockedInitially, unlockedThroughTech).distinct().toList();
   }
 }

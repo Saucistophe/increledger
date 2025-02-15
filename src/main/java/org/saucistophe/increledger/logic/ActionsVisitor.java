@@ -28,6 +28,7 @@ public class ActionsVisitor {
       return false;
     }
 
+    // TODO handle cap
     var techOptional =
         gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
 
@@ -50,6 +51,7 @@ public class ActionsVisitor {
     if (techOptional.isEmpty())
       throw new InternalServerErrorException("Tech " + techName + " not found in the game's rules");
     game.spendResources(techOptional.get().getCost());
+    game.getTechs().compute(techName, (t, cost) -> cost == null ? 1 : cost + 1);
   }
 
   public boolean isValid(AssignOccupation assignOccupation, Game game) {
