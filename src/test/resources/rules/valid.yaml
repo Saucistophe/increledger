@@ -2,6 +2,7 @@
 ---
 populations:
   - name: people
+    unlocked: true
     initialCount: 2
     initialCap: 5
 resources:

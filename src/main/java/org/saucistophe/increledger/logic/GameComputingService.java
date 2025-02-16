@@ -187,9 +187,21 @@ public class GameComputingService {
     return allEffects;
   }
 
+  public List<String> getAvailablePopulations(Game game) {
+    var unlockedInitially =
+      gameRules.getPopulations().stream().filter(NamedEntityWithEffects::isUnlocked).map(NamedEntityWithEffects::getName);
+    var unlockedThroughTech =
+      getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
+        .map(r -> r.effect.getTarget())
+        .filter(
+          t -> gameRules.getPopulations().stream().map(NamedEntity::getName).anyMatch(t::equals));
+    return Stream.concat(unlockedInitially, unlockedThroughTech).distinct().toList();
+  }
+
   public List<String> getAvailableOccupations(Game game) {
     var unlockedInitially =
         gameRules.getOccupations().stream().filter(Occupation::isUnlocked).map(Occupation::getName);
+    // TODO you should be able to see some occupations right after the relevant population is unlocked.
     var unlockedThroughTech =
         getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
             .map(r -> r.effect.getTarget())

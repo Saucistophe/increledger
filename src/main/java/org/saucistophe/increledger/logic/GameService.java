@@ -12,6 +12,7 @@ import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -91,6 +92,33 @@ public class GameService extends GameComputingService {
           .add(
               new GameDescription.TechDto(
                   tech, game.getTechs().getOrDefault(tech, 0L), techCaps.get(tech)));
+    }
+
+    result.setPopulations(new ArrayList<>());
+    var availablePopulations = getAvailablePopulations(game);
+    var availableOccupations = getAvailableOccupations(game);
+    var populationsCaps = getPopulationCaps(game);
+
+    for (var populationName : availablePopulations) {
+      List<GameDescription.OccupationDto> occupations = new ArrayList<>();
+      for (var occupationName : availableOccupations) {
+        var occupation = gameRules.getOccupationById(occupationName);
+        if (occupation.getPopulation().equals(populationName)) {
+          occupations.add(
+              new GameDescription.OccupationDto(
+                  occupationName,
+                  game.getOccupations().getOrDefault(populationName, 0L),
+                  occupation.getCap())); // TODO handle occupations caps...
+        }
+      }
+      result
+          .getPopulations()
+          .add(
+              new GameDescription.PopulationDto(
+                  populationName,
+                  game.getPopulations().get(populationName),
+                  populationsCaps.get(populationName),
+                  occupations));
     }
 
     return result;
