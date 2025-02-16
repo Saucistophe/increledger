@@ -43,7 +43,7 @@ class GameResourceTest {
             .as(GameDto.class);
 
     // Production not yet started
-    assertFalse(gameDto.getGame().getResources().containsKey("wood"));
+    assertEquals(0, gameDto.getGame().getResources().get("wood"));
 
     CompletableFuture.runAsync(
             () -> {}, CompletableFuture.delayedExecutor(100, TimeUnit.MILLISECONDS))
@@ -105,7 +105,7 @@ class GameResourceTest {
         .body("$", hasSize(1))
         .body("$", hasItem("woodcutter"));
 
-    gameDto.getGame().getTechs().put("quarry_workers",1L);
+    gameDto.getGame().getTechs().put("quarry_workers", 1L);
 
     given()
         .header("Content-type", "application/json")
