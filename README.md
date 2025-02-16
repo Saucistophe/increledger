@@ -1,6 +1,8 @@
 # Increledger, a robust incremental game server
 
-![](.github/badges/jacoco.svg) ![](.github/badges/branches.svg)
+![](https://github.com/Saucistophe/increledger/actions/workflows/maven.yml/badge.svg)
+![](.github/badges/jacoco.svg)
+![](.github/badges/branches.svg)
 
 ```
       ______ ______    (\
