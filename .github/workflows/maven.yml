@@ -46,7 +46,7 @@ jobs:
 
     - name: Compute coverage
       run: |
-        apt install -y --no-install-recommends xmlstarlet
+        sudo apt install -y --no-install-recommends xmlstarlet
         missed=$(xmlstarlet sel -t -v "/report/counter[@type='INSTRUCTION']/@missed" target/jacoco-report/jacoco.xml)
         covered=$(xmlstarlet sel -t -v "/report/counter[@type='INSTRUCTION']/@covered" target/jacoco-report/jacoco.xml)
         coverage=$(bc -l <<< "100 * $covered / ($missed + $covered)")
