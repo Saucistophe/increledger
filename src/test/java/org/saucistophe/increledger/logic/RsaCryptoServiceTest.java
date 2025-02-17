@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 @TestProfile(RsaCryptoProfile.class)
 @QuarkusTest
 class RsaCryptoServiceTest {
+
   @Inject CryptoService cryptoService;
 
   @Test

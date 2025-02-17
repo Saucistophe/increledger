@@ -1,8 +1,10 @@
 package org.saucistophe.increledger.logic;
 
+import io.quarkus.arc.DefaultBean;
 import io.quarkus.arc.profile.IfBuildProfile;
 import io.quarkus.logging.Log;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Typed;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.io.IOException;
@@ -14,9 +16,11 @@ import java.security.spec.*;
 import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 
+@Typed(CryptoService.class)
 @RequiredArgsConstructor
 @ApplicationScoped
 @IfBuildProfile("secure")
+@DefaultBean
 public class RsaCryptoService implements CryptoService {
 
   private final PrivateKey privateKey;
