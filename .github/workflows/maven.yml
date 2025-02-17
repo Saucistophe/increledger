@@ -57,11 +57,9 @@ jobs:
 
     - name: Coverage badge
       uses: RubbaBoy/BYOB@v1.3.0
-      env:
-        COVERAGE: ${{steps.compute_coverage.outputs.coverage}}
       with:
         name: Coverage
         label: 'Coverage'
-        status: $COVERAGE
+        status:  ${{steps.compute_coverage.outputs.coverage}}
         color: 00EEFF
         github_token: ${{ secrets.GITHUB_TOKEN }}
