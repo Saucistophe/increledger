@@ -26,7 +26,7 @@ class RsaCryptoServiceTest {
 
   @Test
   void signAndVerify() {
-    var initialData = RandomStringUtils.insecure().nextAscii(100);
+    var initialData = RandomStringUtils.insecure().nextAscii(10000);
     var signature = cryptoService.sign(initialData);
     assertTrue(cryptoService.verify(initialData, signature));
     assertFalse(cryptoService.verify(initialData + "a", signature));
