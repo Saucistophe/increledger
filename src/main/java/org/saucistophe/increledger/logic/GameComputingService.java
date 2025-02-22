@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Stream;
-
 import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.effects.*;
 import org.saucistophe.increledger.model.rules.*;
+import org.saucistophe.increledger.model.rules.effects.*;
 
 /** Service used only for presenting the game's state in a more computing-friendly manner. */
 @RequiredArgsConstructor
@@ -189,19 +188,25 @@ public class GameComputingService {
 
   public List<String> getAvailablePopulations(Game game) {
     var unlockedInitially =
-      gameRules.getPopulations().stream().filter(NamedEntityWithEffects::isUnlocked).map(NamedEntityWithEffects::getName);
+        gameRules.getPopulations().stream()
+            .filter(NamedEntityWithEffects::isUnlocked)
+            .map(NamedEntityWithEffects::getName);
     var unlockedThroughTech =
-      getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
-        .map(r -> r.effect.getTarget())
-        .filter(
-          t -> gameRules.getPopulations().stream().map(NamedEntity::getName).anyMatch(t::equals));
+        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
+            .map(r -> r.effect.getTarget())
+            .filter(
+                t ->
+                    gameRules.getPopulations().stream()
+                        .map(NamedEntity::getName)
+                        .anyMatch(t::equals));
     return Stream.concat(unlockedInitially, unlockedThroughTech).distinct().toList();
   }
 
   public List<String> getAvailableOccupations(Game game) {
     var unlockedInitially =
         gameRules.getOccupations().stream().filter(Occupation::isUnlocked).map(Occupation::getName);
-    // TODO you should be able to see some occupations right after the relevant population is unlocked.
+    // TODO you should be able to see some occupations right after the relevant population is
+    // unlocked.
     var unlockedThroughTech =
         getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
             .map(r -> r.effect.getTarget())

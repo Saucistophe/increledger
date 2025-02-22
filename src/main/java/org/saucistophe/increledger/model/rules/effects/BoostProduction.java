@@ -1,11 +1,11 @@
-package org.saucistophe.increledger.model.effects;
+package org.saucistophe.increledger.model.rules.effects;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
-import java.util.List;
-
+@RegisterForReflection
 @Data
 public class BoostProduction implements Effect {
 

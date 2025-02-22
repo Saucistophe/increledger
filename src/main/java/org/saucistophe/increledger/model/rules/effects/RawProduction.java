@@ -1,11 +1,13 @@
-package org.saucistophe.increledger.model.effects;
+package org.saucistophe.increledger.model.rules.effects;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+@RegisterForReflection
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

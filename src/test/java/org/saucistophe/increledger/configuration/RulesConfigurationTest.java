@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Test;
-import org.saucistophe.increledger.model.effects.RawProduction;
+import org.saucistophe.increledger.model.rules.effects.RawProduction;
 
 @QuarkusTest
 class RulesConfigurationTest {
@@ -22,7 +22,8 @@ class RulesConfigurationTest {
     assertEquals(2, rules.getOccupations().size());
     assertEquals("woodcutter", rules.getOccupations().getFirst().getName());
     assertTrue(rules.getOccupations().getFirst().isUnlocked());
-    assertEquals(new RawProduction("wood",1.), rules.getOccupations().getFirst().getEffects().getFirst());
+    assertEquals(
+        new RawProduction("wood", 1.), rules.getOccupations().getFirst().getEffects().getFirst());
   }
 
   @Test

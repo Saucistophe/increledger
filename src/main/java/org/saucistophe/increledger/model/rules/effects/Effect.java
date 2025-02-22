@@ -1,4 +1,4 @@
-package org.saucistophe.increledger.model.effects;
+package org.saucistophe.increledger.model.rules.effects;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
