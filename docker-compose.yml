@@ -5,3 +5,7 @@ services:
       - 80:80
   back:
     image: ghcr.io/saucistophe/increledger:main
+    volumes:
+      - ./backend/src/test/resources/rules/valid.yaml:/work/rules.yaml
+      - ./backend/src/test/resources/public_key.pem:/work/public_key.pem
+      - ./backend/src/test/resources/private_key.pem:/work/private_key.pem
