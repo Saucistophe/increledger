@@ -1,0 +1,7 @@
+services:
+  front:
+    image: ghcr.io/saucistophe/increledger-front
+    ports:
+      - 8080:8080
+  back:
+    image: ghcr.io/saucistophe/increledger
