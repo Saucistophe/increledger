@@ -1,8 +1,8 @@
 # Increledger, a robust incremental game server
 
-![](https://github.com/Saucistophe/increledger/actions/workflows/maven.yml/badge.svg)
+![](https://github.com/Saucistophe/increledger/actions/workflows/maven.yml/badge.svg)![](https://byob.yarr.is/Saucistophe/increledger/Coverage)
+
 ![](https://github.com/Saucistophe/increledger/actions/workflows/npm.yml/badge.svg)
-![](https://byob.yarr.is/Saucistophe/increledger/Coverage)
 
 ```
       ______ ______    (\
