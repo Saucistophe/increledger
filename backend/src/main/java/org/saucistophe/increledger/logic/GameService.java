@@ -107,7 +107,7 @@ public class GameService extends GameComputingService {
           occupations.add(
               new GameDescription.OccupationDto(
                   occupationName,
-                  game.getOccupations().getOrDefault(populationName, 0L),
+                  game.getOccupations().getOrDefault(occupationName, 0L),
                   occupation.getCap())); // TODO handle occupations caps...
         }
       }

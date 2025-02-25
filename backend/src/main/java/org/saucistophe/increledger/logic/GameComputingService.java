@@ -130,7 +130,7 @@ public class GameComputingService {
       var occupation = gameRules.getOccupationById(occupationName);
 
       result.computeIfPresent(
-          occupationName,
+          occupation.getPopulation(),
           (k, v) -> v - occupation.getPopulationNeeded() * gameOccupation.getValue());
     }
     return result;
