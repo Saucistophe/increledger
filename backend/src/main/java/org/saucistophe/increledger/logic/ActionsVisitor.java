@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.actions.AssignOccupation;
 import org.saucistophe.increledger.model.actions.Research;
+import org.saucistophe.increledger.model.actions.UnassignOccupation;
 import org.saucistophe.increledger.model.rules.GameRules;
 
 @ApplicationScoped
@@ -83,5 +84,37 @@ public class ActionsVisitor {
     var gameOccupations = game.getOccupations();
     var amount = gameOccupations.getOrDefault(occupation, 0L);
     gameOccupations.put(occupation, amount + numbersOfAssignees);
+  }
+
+  public boolean isValid(UnassignOccupation unassignOccupation, Game game) {
+    var occupationId = unassignOccupation.getOccupation();
+    var numbersOfAssignees = unassignOccupation.getNumbersOfAssignees();
+
+    if (occupationId == null) {
+      Log.error("Occupation is null in assignment");
+      return false;
+    }
+    var occupation = gameRules.getOccupationById(occupationId);
+    if (occupation == null) {
+      Log.error("Occupation " + occupationId + " not found in game's rules");
+      return false;
+    }
+    var currentAssignees = game.getOccupations().getOrDefault(occupationId, 0L);
+
+    if (numbersOfAssignees <= 0 || currentAssignees < numbersOfAssignees) {
+      Log.error("Invalid number for assigment: " + numbersOfAssignees);
+      return false;
+    }
+
+    return true;
+  }
+
+  public void execute(UnassignOccupation unassignOccupation, Game game) {
+    var occupation = unassignOccupation.getOccupation();
+    var numbersOfAssignees = unassignOccupation.getNumbersOfAssignees();
+
+    var gameOccupations = game.getOccupations();
+    var amount = gameOccupations.getOrDefault(occupation, 0L);
+    gameOccupations.put(occupation, amount - numbersOfAssignees);
   }
 }

@@ -16,7 +16,8 @@ export type Population = {
     name: string;
     count: number;
     cap: number;
-    occupations: Occupation[]
+    occupations: Occupation[];
+    freePopulation: number;
 };
 
 

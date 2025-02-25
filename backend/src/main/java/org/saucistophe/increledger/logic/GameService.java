@@ -99,7 +99,9 @@ public class GameService extends GameComputingService {
     var availableOccupations = getAvailableOccupations(game);
     var populationsCaps = getPopulationCaps(game);
 
+    var freePopulations = getFreePopulations(game);
     for (var populationName : availablePopulations) {
+
       List<GameDescription.OccupationDto> occupations = new ArrayList<>();
       for (var occupationName : availableOccupations) {
         var occupation = gameRules.getOccupationById(occupationName);
@@ -118,6 +120,7 @@ public class GameService extends GameComputingService {
                   populationName,
                   game.getPopulations().get(populationName),
                   populationsCaps.get(populationName),
+                  freePopulations.get(populationName),
                   occupations));
     }
 
@@ -168,7 +171,7 @@ public class GameService extends GameComputingService {
     // just at zero.
     production = getCurrentProduction(game);
     for (var producedResource : production.keySet())
-      game.getResources().computeIfAbsent(producedResource, k -> 0.);
+      game.getResources().putIfAbsent(producedResource, 0.);
 
     // Sign the game
     var resultGameDto = new GameDto();

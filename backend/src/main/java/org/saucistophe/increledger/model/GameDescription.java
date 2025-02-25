@@ -9,7 +9,8 @@ public class GameDescription {
 
   public record OccupationDto(String name, long count, long cap) {}
 
-  public record PopulationDto(String name, long count, long cap, List<OccupationDto> occupations) {}
+  public record PopulationDto(
+      String name, long count, long cap, long freePopulation, List<OccupationDto> occupations) {}
 
   public record TechDto(String name, long count, long cap) {}
 

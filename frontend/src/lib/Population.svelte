@@ -1,16 +1,26 @@
 <script lang="ts">
     import type {Population} from "./shared.svelte";
-    import {gameState} from "./game-service.svelte";
+    import {gameState, updateGame} from "./game-service.svelte";
 
     let {population}: { population: Population } = $props();
 
     async function assign(occupationName: string) {
-        console.log("assign", occupationName);
-        gameState.actions.push(    {
+        gameState.actions.push({
             "type": ".AssignOccupation",
-            "occupation": "woodcutter",
+            "occupation": occupationName,
             "numbersOfAssignees": 1
         });
+        await updateGame();
+
+    }
+
+    async function unassign(occupationName: string) {
+        gameState.actions.push({
+            "type": ".UnassignOccupation",
+            "occupation": occupationName,
+            "numbersOfAssignees": 1
+        });
+        await updateGame();
 
     }
 
@@ -20,6 +30,9 @@
 {#each population.occupations as occupation}
     <p>{occupation.name}: {occupation.count}
         {#if occupation.cap >= 0} / {occupation.cap}{/if}
-        <button onclick={()=>assign(occupation.name)}>+</button>
+        <button disabled="{occupation.count <= 0}" onclick={()=>unassign(occupation.name)}>-</button>
+        <button disabled="{population.freePopulation <= 0 || (population.cap >= 0 && occupation.count >= population.cap)}"
+                onclick={()=>assign(occupation.name)}>+
+        </button>
     </p>
 {/each}
