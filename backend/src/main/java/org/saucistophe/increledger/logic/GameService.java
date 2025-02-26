@@ -86,12 +86,16 @@ public class GameService extends GameComputingService {
     result.setTechs(new ArrayList<>());
     var techs = getAvailableTechs(game);
     var techCaps = getTechCaps(game);
-    for (var tech : techs) {
+    for (var techName : techs) {
+      var tech = gameRules.getTechById(techName);
       result
           .getTechs()
           .add(
               new GameDescription.TechDto(
-                  tech, game.getTechs().getOrDefault(tech, 0L), techCaps.get(tech)));
+                  techName,
+                  game.getTechs().getOrDefault(techName, 0L),
+                  techCaps.get(techName),
+                  tech.getCost())); // TODO handle exponential cost
     }
 
     result.setPopulations(new ArrayList<>());

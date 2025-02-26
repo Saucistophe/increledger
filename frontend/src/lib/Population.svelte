@@ -10,8 +10,6 @@
             "occupation": occupationName,
             "numbersOfAssignees": 1
         });
-
-
     }
 
     async function unassign(occupationName: string) {

@@ -25,6 +25,7 @@ export type Tech = {
     name: string;
     count: number;
     cap: number;
+    cost: Map<string, number>;
 };
 
 

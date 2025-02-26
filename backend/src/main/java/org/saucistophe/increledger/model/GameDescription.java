@@ -1,6 +1,7 @@
 package org.saucistophe.increledger.model;
 
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 
 @Data
@@ -12,7 +13,7 @@ public class GameDescription {
   public record PopulationDto(
       String name, long count, long cap, long freePopulation, List<OccupationDto> occupations) {}
 
-  public record TechDto(String name, long count, long cap) {}
+  public record TechDto(String name, long count, long cap, Map<String, Double> cost) {}
 
   List<ResourceDto> resources;
   List<PopulationDto> populations;
