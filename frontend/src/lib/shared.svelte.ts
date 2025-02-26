@@ -21,7 +21,15 @@ export type Population = {
 };
 
 
+export type Tech = {
+    name: string;
+    count: number;
+    cap: number;
+};
+
+
 export type GameDescription = {
     populations: Population[];
     resources: Resource[];
+    techs: Tech[];
 }

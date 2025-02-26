@@ -5,12 +5,7 @@
 </script>
 
 <main>
-    <h1>Increledger</h1>
-
-    <div class="card">
-        <Game/>
-    </div>
-
+    <Game/>
     <div class="footer">
         <a href="https://vite.dev" target="_blank" rel="noreferrer">
             <img src={viteLogo} class="logo" alt="Vite Logo"/>

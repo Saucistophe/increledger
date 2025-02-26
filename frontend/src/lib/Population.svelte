@@ -1,27 +1,25 @@
 <script lang="ts">
     import type {Population} from "./shared.svelte";
-    import {gameState, updateGame} from "./game-service.svelte";
+    import {executeAction} from "./game-service.svelte";
 
     let {population}: { population: Population } = $props();
 
     async function assign(occupationName: string) {
-        gameState.actions.push({
+        await executeAction({
             "type": ".AssignOccupation",
             "occupation": occupationName,
             "numbersOfAssignees": 1
         });
-        await updateGame();
+
 
     }
 
     async function unassign(occupationName: string) {
-        gameState.actions.push({
+        await executeAction({
             "type": ".UnassignOccupation",
             "occupation": occupationName,
             "numbersOfAssignees": 1
         });
-        await updateGame();
-
     }
 
 </script>
