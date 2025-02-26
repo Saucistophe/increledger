@@ -17,4 +17,10 @@ public class Occupation extends NamedEntityWithEffects {
 
   @Min(-1)
   private long cap = -1; // A cap of -1 means unlimited
+
+  @Override
+  public boolean isValid(GameRules gameRules) {
+    return gameRules.getPopulationById(population) != null
+        && effects.stream().allMatch(e -> e.isValid(gameRules));
+  }
 }

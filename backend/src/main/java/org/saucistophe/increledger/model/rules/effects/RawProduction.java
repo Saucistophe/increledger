@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.saucistophe.increledger.model.rules.GameRules;
 
 @RegisterForReflection
 @Data
@@ -17,4 +18,9 @@ public class RawProduction implements Effect {
 
   @DecimalMin("0")
   double amount;
+
+  @Override
+  public boolean isValid(GameRules gameRules) {
+    return gameRules.getResourceById(resource) != null;
+  }
 }

@@ -40,9 +40,17 @@ public class RulesConfiguration {
     if (!violations.isEmpty()) {
       throw new ConstraintViolationException(violations);
     }
+
+    ensureAllTargetsAreFound(gameRules);
     // TODO look for cycles in tech boosts
     // TODO ensure nothing boosts the caps of something with cap -1
 
     return gameRules;
+  }
+
+  private void ensureAllTargetsAreFound(GameRules gameRules) {
+    for (var tech : gameRules.getTechs()) {
+      for (var effect : tech.getEffects()) {}
+    }
   }
 }

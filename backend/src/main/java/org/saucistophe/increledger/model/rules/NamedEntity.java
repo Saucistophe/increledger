@@ -8,4 +8,6 @@ import lombok.Data;
 @Data
 public abstract class NamedEntity {
   @NotBlank private String name;
+
+  public abstract boolean isValid(GameRules gameRules);
 }

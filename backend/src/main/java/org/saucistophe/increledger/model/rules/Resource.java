@@ -11,4 +11,9 @@ import lombok.EqualsAndHashCode;
 public class Resource extends NamedEntity {
   @DecimalMin("1")
   private double initialCap;
+
+  @Override
+  public boolean isValid(GameRules gameRules) {
+    return true;
+  }
 }
