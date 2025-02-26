@@ -1,7 +1,7 @@
 
 export type Resource = {
     name: string;
-    count: number;
+    amount: number;
     cap: number;
 }
 

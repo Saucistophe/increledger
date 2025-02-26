@@ -26,7 +26,7 @@
 
 </script>
 
-<h2>{population.name}</h2>
+<h2>{population.name} ({population.count}/{population.cap})</h2>
 {#each population.occupations as occupation}
     <p>{occupation.name}: {occupation.count}
         {#if occupation.cap >= 0} / {occupation.cap}{/if}

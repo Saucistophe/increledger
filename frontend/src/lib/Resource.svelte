@@ -1,5 +1,7 @@
 <script lang="ts">
-    let { resource = null} = $props();
+    import type {Resource} from "./shared.svelte";
+
+    let {resource}: { resource: Resource } = $props();
 </script>
 
-<p>The resource is {JSON.stringify(resource)}</p>
+<p>{resource.name} : {resource.amount.toFixed(1)} / {resource.cap}</p>
