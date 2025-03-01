@@ -10,7 +10,19 @@ type GameState = {
 
 export const gameState: GameState = $state({initialized: false} as any as GameState);
 
-let updating=false;
+// Attempt to load from local storage
+const storage = window.localStorage.getItem('gameState');
+if (storage) {
+    const storedGameState = JSON.parse(storage) as GameState;
+    gameState.gameDescription = storedGameState.gameDescription;
+    gameState.signature = storedGameState.signature;
+    gameState.game = storedGameState.game;
+    gameState.actions = [];
+    gameState.initialized = true;
+}
+
+let updating = false;
+
 export async function updateGame() {
     updating = true;
     if (!gameState.initialized) {
@@ -40,10 +52,12 @@ export async function updateGame() {
             gameState.actions = [];
         }
     }
-    updating=false;
+    updating = false;
+    window.localStorage.setItem('gameState', JSON.stringify(gameState));
 }
 
 let autoUpdateEnabled: boolean;
+
 function autoUpdate() {
     if (!autoUpdateEnabled) return;
     updateGame().then(() => console.debug("Game auto-updated"));
@@ -60,11 +74,11 @@ export function stopAutoUpdate() {
 }
 
 export async function executeAction(action: any) {
-    if(updating) {
-        setTimeout(executeAction, 100,action);
+    if (updating) {
+        setTimeout(executeAction, 100, action);
         return;
     }
 
-    gameState.actions=[action];
+    gameState.actions = [action];
     await updateGame();
 }

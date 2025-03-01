@@ -2,32 +2,33 @@
 ---
 populations:
   - name: people
-    unlocked: true
     initialCount: 2
-    initialCap: 5
+    cap: 5
 resources:
   - name: wood
-    initialCap: 50
+    cap: 50
+    emoji: 🪵
   - name: food
-    initialCap: 50
+    cap: 50
+    emoji: 🍗
   - name: stone
-    initialCap: 50
+    cap: 50
+    emoji: 🪨
   - name: knowledge
-    initialCap: 100
+    cap: 100
+    emoji: 💡
 occupations:
   - name: woodcutter
     population: people
-    unlocked: true
     effects:
       - type: .RawProduction
         resource: wood
         amount: 1
   - name: researcher
     population: people
-    unlocked: true
     effects:
       - type: .RawProduction
-        resource: knowledge # TODO: Ensure all resources are described somewhere
+        resource: knowledge
         amount: 0.2
   - name: quarry_worker
     population: people
@@ -35,11 +36,12 @@ occupations:
       - type: .RawProduction
         resource: stone
         amount: 1
+    prerequisites:
+      quarry_workers: 1
 techs:
   - name: quarry_workers
-    unlocked: true
+    cap: 1
     cost:
       knowledge: 50
-    effects:
-      - type: .Unlock
-        target: quarry_worker
+    prerequisites:
+      knowledge: 10

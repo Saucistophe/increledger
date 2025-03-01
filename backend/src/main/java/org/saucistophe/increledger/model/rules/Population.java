@@ -14,10 +14,10 @@ public class Population extends NamedEntityWithEffects {
   private long initialCount = 0;
 
   @Min(0)
-  private long initialCap = 0;
+  private long cap = 0;
 
   @Override
   public boolean isValid(GameRules gameRules) {
-    return effects.stream().allMatch(e -> e.isValid(gameRules));
+    return effects == null || effects.stream().allMatch(e -> e.isValid(gameRules));
   }
 }

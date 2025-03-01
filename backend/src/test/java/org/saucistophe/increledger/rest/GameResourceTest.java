@@ -8,7 +8,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.Test;
 import org.saucistophe.increledger.model.GameDto;
 import org.saucistophe.increledger.model.actions.AssignOccupation;
@@ -61,62 +60,5 @@ class GameResourceTest {
             .as(GameDto.class);
     var currentWood = gameDto.getGame().getResources().get("wood");
     assertTrue(currentWood > 0.);
-  }
-
-  @Test
-  void getProduction() {
-
-    var gameDto = given().when().get("/game").then().statusCode(200).extract().as(GameDto.class);
-    gameDto.getActions().add(new AssignOccupation("woodcutter", 1L));
-    gameDto =
-        given()
-            .header("Content-type", "application/json")
-            .and()
-            .body(gameDto)
-            .when()
-            .post("/game")
-            .then()
-            .statusCode(200)
-            .extract()
-            .as(GameDto.class);
-
-    given()
-        .header("Content-type", "application/json")
-        .and()
-        .body(gameDto)
-        .when()
-        .post("/game/production")
-        .then()
-        .statusCode(200)
-        .body("wood", CoreMatchers.equalTo(1f));
-  }
-
-  @Test
-  void getAvailableOccupations() {
-    var gameDto = given().when().get("/game").then().statusCode(200).extract().as(GameDto.class);
-    given()
-        .header("Content-type", "application/json")
-        .and()
-        .body(gameDto)
-        .when()
-        .post("/game/occupations")
-        .then()
-        .statusCode(200)
-        .body("$", hasSize(1))
-        .body("$", hasItem("woodcutter"));
-
-    gameDto.getGame().getTechs().put("quarry_workers", 1L);
-
-    given()
-        .header("Content-type", "application/json")
-        .and()
-        .body(gameDto)
-        .when()
-        .post("/game/occupations")
-        .then()
-        .statusCode(200)
-        .body("$", hasSize(2))
-        .body("$", hasItem("woodcutter"))
-        .body("$", hasItem("quarry_worker"));
   }
 }

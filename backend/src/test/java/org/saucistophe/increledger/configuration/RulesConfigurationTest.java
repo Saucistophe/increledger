@@ -17,11 +17,11 @@ class RulesConfigurationTest {
 
     assertEquals(4, rules.getResources().size());
     assertEquals("wood", rules.getResources().getFirst().getName());
-    assertEquals(50, rules.getResources().getFirst().getInitialCap());
+    assertEquals(50, rules.getResources().getFirst().getCap());
 
     assertEquals(2, rules.getOccupations().size());
     assertEquals("woodcutter", rules.getOccupations().getFirst().getName());
-    assertTrue(rules.getOccupations().getFirst().isUnlocked());
+    assertTrue(rules.getOccupations().getFirst().getPrerequisites().isEmpty());
     assertEquals(
         new RawProduction("wood", 1.), rules.getOccupations().getFirst().getEffects().getFirst());
   }

@@ -6,7 +6,8 @@ import lombok.Data;
 
 @Data
 public class GameDescription {
-  public record ResourceDto(String name, double amount, double cap, double production) {}
+  public record ResourceDto(
+      String name, double amount, double cap, double production, String emoji) {}
 
   public record OccupationDto(String name, long count, long cap) {}
 

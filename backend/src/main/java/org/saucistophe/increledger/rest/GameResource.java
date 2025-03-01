@@ -6,8 +6,6 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
-import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import org.saucistophe.increledger.logic.GameService;
 import org.saucistophe.increledger.model.GameDto;
@@ -28,19 +26,5 @@ public class GameResource {
   @Produces(MediaType.APPLICATION_JSON)
   public GameDto processGame(@Valid GameDto game) {
     return gameService.process(game);
-  }
-
-  @POST
-  @Path("/production")
-  @Produces(MediaType.APPLICATION_JSON)
-  public Map<String, Double> getProduction(@Valid GameDto gameDto) {
-    return gameService.getCurrentProduction(gameDto.getGame());
-  }
-
-  @POST
-  @Path("/occupations")
-  @Produces(MediaType.APPLICATION_JSON)
-  public List<String> getAvailableOccupations(@Valid GameDto gameDto) {
-    return gameService.getAvailableOccupations(gameDto.getGame());
   }
 }

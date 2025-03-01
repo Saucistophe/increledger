@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.rules.*;
@@ -47,7 +46,7 @@ public class GameComputingService {
     Map<String, Double> caps = new HashMap<>();
 
     for (var resource : gameRules.getResources()) {
-      caps.put(resource.getName(), resource.getInitialCap());
+      caps.put(resource.getName(), resource.getCap());
     }
 
     var capIncreases = getAllEffectsFromEntities(game, IncreaseCap.class);
@@ -65,7 +64,7 @@ public class GameComputingService {
     Map<String, Long> caps = new HashMap<>();
 
     for (var tech : gameRules.getTechs()) {
-      caps.put(tech.getName(), tech.getInitialCap());
+      caps.put(tech.getName(), tech.getCap());
     }
 
     var capIncreases = getAllEffectsFromEntities(game, IncreaseCap.class);
@@ -83,7 +82,7 @@ public class GameComputingService {
     Map<String, Long> caps = new HashMap<>();
 
     for (Population population : gameRules.getPopulations()) {
-      caps.put(population.getName(), population.getInitialCap());
+      caps.put(population.getName(), population.getCap());
     }
 
     // TODO handle separate boosts for caps and pop? Handle boosts here? Create a method that
@@ -184,48 +183,5 @@ public class GameComputingService {
     allEffects.addAll(
         getEffectsFromEntities(game.getOccupations(), gameRules::getOccupationById, targetClass));
     return allEffects;
-  }
-
-  public List<String> getAvailablePopulations(Game game) {
-    var unlockedInitially =
-        gameRules.getPopulations().stream()
-            .filter(NamedEntityWithEffects::isUnlocked)
-            .map(NamedEntityWithEffects::getName);
-    var unlockedThroughTech =
-        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
-            .map(r -> r.effect.getTarget())
-            .filter(
-                t ->
-                    gameRules.getPopulations().stream()
-                        .map(NamedEntity::getName)
-                        .anyMatch(t::equals));
-    return Stream.concat(unlockedInitially, unlockedThroughTech).distinct().toList();
-  }
-
-  public List<String> getAvailableOccupations(Game game) {
-    var unlockedInitially =
-        gameRules.getOccupations().stream().filter(Occupation::isUnlocked).map(Occupation::getName);
-    // TODO you should be able to see some occupations right after the relevant population is
-    // unlocked.
-    var unlockedThroughTech =
-        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
-            .map(r -> r.effect.getTarget())
-            .filter(
-                t ->
-                    gameRules.getOccupations().stream()
-                        .map(NamedEntity::getName)
-                        .anyMatch(t::equals));
-    return Stream.concat(unlockedInitially, unlockedThroughTech).distinct().toList();
-  }
-
-  public List<String> getAvailableTechs(Game game) {
-    var unlockedInitially =
-        gameRules.getTechs().stream().filter(Tech::isUnlocked).map(Tech::getName);
-    var unlockedThroughTech =
-        getEffectsFromEntities(game.getTechs(), gameRules::getTechById, Unlock.class).stream()
-            .map(r -> r.effect.getTarget())
-            .filter(
-                t -> gameRules.getTechs().stream().map(NamedEntity::getName).anyMatch(t::equals));
-    return Stream.concat(unlockedInitially, unlockedThroughTech).distinct().toList();
   }
 }

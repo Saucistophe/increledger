@@ -6,17 +6,17 @@ populations:
     initialCount: -1
   # Invalid cap
   - name: soldiers
-    initialCap: -1
+    cap: -1
 resources:
   # Missing name
-  - initialCap: 50
+  - cap: 50
   - name: ""
-    initialCap: 50
+    cap: 50
   # Missing cap
   - name: food
   # Invalid cap
   - name: maaan
-    initialCap: -1
+    cap: -1
 occupations:
   # Missing name
   - unlocked: true

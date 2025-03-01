@@ -12,6 +12,7 @@ import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -50,9 +51,7 @@ public class GameService extends GameComputingService {
     resultGameDto.setGame(game);
     resultGameDto.setSignature(cryptoService.sign(toJson(game)));
 
-    resultGameDto.setGameDescription(getDescription(game));
-
-    return resultGameDto;
+    return process(resultGameDto);
   }
 
   public GameDescription getDescription(Game game) {
@@ -79,56 +78,86 @@ public class GameService extends GameComputingService {
                     resource.getName(),
                     game.getResources().get(resource.getName()),
                     resourcesCaps.get(resource.getName()),
-                    production.getOrDefault(resource.getName(), 0.)));
+                    production.getOrDefault(resource.getName(), 0.),
+                    resource.getEmoji()));
       }
     }
 
     result.setTechs(new ArrayList<>());
-    var techs = getAvailableTechs(game);
+    var techs = game.getTechs();
     var techCaps = getTechCaps(game);
-    for (var techName : techs) {
-      var tech = gameRules.getTechById(techName);
-      result
-          .getTechs()
-          .add(
-              new GameDescription.TechDto(
-                  techName,
-                  game.getTechs().getOrDefault(techName, 0L),
-                  techCaps.get(techName),
-                  tech.getCost())); // TODO handle exponential cost
-    }
-
+    techs.forEach(
+        (techName, techCount) -> {
+          var tech = gameRules.getTechById(techName);
+          result
+              .getTechs()
+              .add(
+                  new GameDescription.TechDto(
+                      techName,
+                      techCount,
+                      techCaps.get(techName),
+                      tech.getCost())); // TODO handle exponential cost
+        });
     result.setPopulations(new ArrayList<>());
-    var availablePopulations = getAvailablePopulations(game);
-    var availableOccupations = getAvailableOccupations(game);
+    var availablePopulations = game.getPopulations();
+    var availableOccupations = game.getOccupations();
     var populationsCaps = getPopulationCaps(game);
 
     var freePopulations = getFreePopulations(game);
-    for (var populationName : availablePopulations) {
 
-      List<GameDescription.OccupationDto> occupations = new ArrayList<>();
-      for (var occupationName : availableOccupations) {
-        var occupation = gameRules.getOccupationById(occupationName);
-        if (occupation.getPopulation().equals(populationName)) {
-          occupations.add(
-              new GameDescription.OccupationDto(
-                  occupationName,
-                  game.getOccupations().getOrDefault(occupationName, 0L),
-                  occupation.getCap())); // TODO handle occupations caps...
-        }
-      }
-      result
-          .getPopulations()
-          .add(
-              new GameDescription.PopulationDto(
-                  populationName,
-                  game.getPopulations().get(populationName),
-                  populationsCaps.get(populationName),
-                  freePopulations.get(populationName),
-                  occupations));
-    }
+    availablePopulations.forEach(
+        (populationName, populationCount) -> {
+          List<GameDescription.OccupationDto> occupations = new ArrayList<>();
+          availableOccupations.forEach(
+              (occupationName, occupationCount) -> {
+                var occupation = gameRules.getOccupationById(occupationName);
+                if (occupation.getPopulation().equals(populationName)) {
+                  occupations.add(
+                      new GameDescription.OccupationDto(
+                          occupationName,
+                          occupationCount,
+                          occupation.getCap())); // TODO handle occupations caps...
+                }
+              });
+          result
+              .getPopulations()
+              .add(
+                  new GameDescription.PopulationDto(
+                      populationName,
+                      populationCount,
+                      populationsCaps.get(populationName),
+                      freePopulations.get(populationName),
+                      occupations));
+        });
+
+    sortAccordingToRules(result);
 
     return result;
+  }
+
+  private void sortAccordingToRules(GameDescription result) {
+    result
+        .getResources()
+        .sort(
+            Comparator.comparingInt(
+                r -> gameRules.getResources().indexOf(gameRules.getResourceById(r.name()))));
+    result
+        .getPopulations()
+        .sort(
+            Comparator.comparingInt(
+                r -> gameRules.getPopulations().indexOf(gameRules.getPopulationById(r.name()))));
+    for (var population : result.getPopulations()) {
+      population
+          .occupations()
+          .sort(
+              Comparator.comparingInt(
+                  r -> gameRules.getOccupations().indexOf(gameRules.getOccupationById(r.name()))));
+    }
+    result
+        .getTechs()
+        .sort(
+            Comparator.comparingInt(
+                r -> gameRules.getTechs().indexOf(gameRules.getTechById(r.name()))));
   }
 
   public GameDto process(GameDto gameDto) {
@@ -163,12 +192,17 @@ public class GameService extends GameComputingService {
       game.getResources().put(resource, newAmount);
     }
 
-    for (var action : actions) {
-      if (!action.acceptValidation(actionsVisitor, game)) {
-        Log.error("Invalid action: " + action);
-        throw new BadRequestException("Invalid action");
-      }
-      action.acceptExecution(actionsVisitor, game);
+    // Add here everything that was unlocked from prerequisites, with amount 0
+    for (var tech : gameRules.getTechs()) {
+      if (game.hasAny(tech.getPrerequisites())) game.getTechs().putIfAbsent(tech.getName(), 0L);
+    }
+    for (var occupation : gameRules.getOccupations()) {
+      if (game.hasAny(occupation.getPrerequisites()))
+        game.getOccupations().putIfAbsent(occupation.getName(), 0L);
+    }
+    for (var population : gameRules.getPopulations()) {
+      if (game.hasAny(population.getPrerequisites()))
+        game.getPopulations().putIfAbsent(population.getName(), 0L);
     }
 
     // Fix the resources: If a production just started, you should still have the resource, even if
@@ -176,6 +210,14 @@ public class GameService extends GameComputingService {
     production = getCurrentProduction(game);
     for (var producedResource : production.keySet())
       game.getResources().putIfAbsent(producedResource, 0.);
+
+    for (var action : actions) {
+      if (!action.acceptValidation(actionsVisitor, game)) {
+        Log.error("Invalid action: " + action);
+        throw new BadRequestException("Invalid action");
+      }
+      action.acceptExecution(actionsVisitor, game);
+    }
 
     // Sign the game
     var resultGameDto = new GameDto();

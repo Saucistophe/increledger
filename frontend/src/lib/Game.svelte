@@ -12,9 +12,9 @@
     });
 </script>
 
-<p>
+<!--p>
     game is {JSON.stringify(gameState.gameDescription, null, 2)}
-</p>
+</p-->
 
 <div>
     {#if gameState.initialized && gameState.gameDescription}
@@ -22,13 +22,22 @@
         {#each gameState.gameDescription.populations as population}
             <Population population={population}/>
         {/each}
-        <h2>Resources</h2>
+        <div class="resources">
         {#each gameState.gameDescription.resources as resource}
             <Resource resource={resource}/>
         {/each}
+        </div>
         <h2>Techs</h2>
         {#each gameState.gameDescription.techs as tech}
             <Tech tech={tech}/>
         {/each}
     {/if}
 </div>
+
+<style>
+    .resources {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+</style>

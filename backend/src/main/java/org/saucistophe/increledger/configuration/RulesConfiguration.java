@@ -2,6 +2,7 @@ package org.saucistophe.increledger.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.quarkus.logging.Log;
 import io.quarkus.runtime.Startup;
 import io.quarkus.runtime.configuration.ConfigurationException;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -11,15 +12,19 @@ import jakarta.validation.Validator;
 import jakarta.ws.rs.Produces;
 import java.io.File;
 import java.io.IOException;
-import lombok.RequiredArgsConstructor;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Stream;
+import lombok.AllArgsConstructor;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.saucistophe.increledger.model.rules.GameRules;
+import org.saucistophe.increledger.model.rules.NamedEntity;
 
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class RulesConfiguration {
 
   @ConfigProperty(name = "rules.path")
-  final String rulesPath;
+  String rulesPath;
 
   @Startup
   @ApplicationScoped
@@ -43,14 +48,25 @@ public class RulesConfiguration {
 
     ensureAllTargetsAreFound(gameRules);
     // TODO look for cycles in tech boosts
-    // TODO ensure nothing boosts the caps of something with cap -1
 
     return gameRules;
   }
 
   private void ensureAllTargetsAreFound(GameRules gameRules) {
-    for (var tech : gameRules.getTechs()) {
-      for (var effect : tech.getEffects()) {}
+
+    var entitiesInError =
+        Stream.<List<? extends NamedEntity>>of(
+                gameRules.getTechs(),
+                gameRules.getResources(),
+                gameRules.getPopulations(),
+                gameRules.getResources())
+            .flatMap(Collection::stream)
+            .filter(e -> !e.isValid(gameRules))
+            .toList();
+    for (var e : entitiesInError) Log.error("Rules not valid for: " + e);
+    if (!entitiesInError.isEmpty()) {
+      throw new ConfigurationException(
+          "Could not load rules because of " + entitiesInError.size() + " errors");
     }
   }
 }

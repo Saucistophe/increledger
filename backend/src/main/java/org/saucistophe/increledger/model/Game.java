@@ -3,6 +3,7 @@ package org.saucistophe.increledger.model;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Stream;
 import lombok.Data;
 
 @Data
@@ -31,5 +32,22 @@ public class Game {
       if (resources.get(entry.getKey()) < entry.getValue()) return false;
     }
     return true;
+  }
+
+  public boolean hasAny(Map<String, Double> requirements) {
+    if (requirements == null) return true;
+
+    Stream<? extends Map.Entry<String, ? extends Number>> allEntities =
+        Stream.of(populations, occupations, techs, resources).flatMap(m -> m.entrySet().stream());
+
+    var satisfiedRequirements =
+        allEntities
+            .filter(
+                e ->
+                    requirements.containsKey(e.getKey())
+                        && e.getValue().doubleValue() >= requirements.get(e.getKey()))
+            .count();
+
+    return satisfiedRequirements >= requirements.size();
   }
 }

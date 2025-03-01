@@ -24,21 +24,20 @@ public class ActionsVisitor {
       return false;
     }
 
-    if (game.getTechs().containsKey(techName)) {
-      Log.info("Tech already researched");
+    if (!game.getTechs().containsKey(techName)) {
+      Log.info("Tech not known in current game");
       return false;
     }
 
     // TODO handle cap
-    var techOptional =
-        gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
-
-    if (techOptional.isEmpty()) {
+    var tech = gameRules.getTechById(techName);
+    if (tech == null) {
       Log.info("Tech " + techName + " not found in the game's rules");
       return false;
     }
 
-    if (!game.hasResources(techOptional.get().getCost())) {
+    // TODO handle exponential cost
+    if (!game.hasResources(tech.getCost())) {
       Log.info("Not enough resources");
       return false;
     }
@@ -47,12 +46,14 @@ public class ActionsVisitor {
 
   public void execute(Research research, Game game) {
     var techName = research.getTech();
-    var techOptional =
-        gameRules.getTechs().stream().filter(t -> t.getName().equals(techName)).findFirst();
-    if (techOptional.isEmpty())
-      throw new InternalServerErrorException("Tech " + techName + " not found in the game's rules");
-    game.spendResources(techOptional.get().getCost());
-    game.getTechs().compute(techName, (t, cost) -> cost == null ? 1 : cost + 1);
+    var tech = gameRules.getTechById(techName);
+    if (tech == null)
+      throw new InternalServerErrorException(
+          "Tech "
+              + techName
+              + " not found in the game's rules, should have been caught in action's validation");
+    game.spendResources(tech.getCost());
+    game.getTechs().compute(techName, (t, amount) -> amount == null ? 1 : amount + 1);
   }
 
   public boolean isValid(AssignOccupation assignOccupation, Game game) {
@@ -63,11 +64,13 @@ public class ActionsVisitor {
       Log.error("Occupation is null in assignment");
       return false;
     }
-    var occupation = gameRules.getOccupationById(occupationId);
-    if (occupation == null) {
-      Log.error("Occupation " + occupationId + " not found in game's rules");
+
+    if (!game.getOccupations().containsKey(occupationId)) {
+      Log.error("Occupation " + occupationId + " not found in game's occupations");
       return false;
     }
+
+    var occupation = gameRules.getOccupationById(occupationId);
     var freePopulations = gameService.getFreePopulations(game);
     if (numbersOfAssignees < 1
         || numbersOfAssignees > freePopulations.get(occupation.getPopulation())) {
@@ -82,6 +85,11 @@ public class ActionsVisitor {
     var numbersOfAssignees = assignOccupation.getNumbersOfAssignees();
 
     var gameOccupations = game.getOccupations();
+    if (!gameOccupations.containsKey(occupation))
+      throw new InternalServerErrorException(
+          "Occupation "
+              + occupation
+              + " not found in game, should have been caught in action's validation");
     var amount = gameOccupations.getOrDefault(occupation, 0L);
     gameOccupations.put(occupation, amount + numbersOfAssignees);
   }
@@ -94,15 +102,16 @@ public class ActionsVisitor {
       Log.error("Occupation is null in assignment");
       return false;
     }
+
+    var currentAssignees = game.getOccupations().getOrDefault(occupationId, 0L);
+    if (numbersOfAssignees <= 0 || currentAssignees < numbersOfAssignees) {
+      Log.error("Invalid number for assigment: " + numbersOfAssignees);
+      return false;
+    }
+
     var occupation = gameRules.getOccupationById(occupationId);
     if (occupation == null) {
       Log.error("Occupation " + occupationId + " not found in game's rules");
-      return false;
-    }
-    var currentAssignees = game.getOccupations().getOrDefault(occupationId, 0L);
-
-    if (numbersOfAssignees <= 0 || currentAssignees < numbersOfAssignees) {
-      Log.error("Invalid number for assigment: " + numbersOfAssignees);
       return false;
     }
 

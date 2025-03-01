@@ -17,8 +17,15 @@ public class BoostProduction implements Effect {
 
   @Override
   public boolean isValid(GameRules gameRules) {
-    return gameRules.getResourceById(target) != null
-        || gameRules.getTechById(target) != null
-        || gameRules.getOccupationById(target) != null;
+    var resource = gameRules.getResourceById(target);
+    var tech = gameRules.getTechById(target);
+    var occupation = gameRules.getOccupationById(target);
+
+    if (resource == null && tech == null && occupation == null) return false;
+
+    if (resource != null && resource.getCap() == -1) return false;
+    if (occupation != null && occupation.getCap() == -1) return false;
+
+    return true;
   }
 }

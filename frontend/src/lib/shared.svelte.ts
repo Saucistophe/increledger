@@ -3,6 +3,8 @@ export type Resource = {
     name: string;
     amount: number;
     cap: number;
+    production: number;
+    emoji: string;
 }
 
 

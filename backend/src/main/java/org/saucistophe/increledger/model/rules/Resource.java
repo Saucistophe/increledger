@@ -10,7 +10,9 @@ import lombok.EqualsAndHashCode;
 @Data
 public class Resource extends NamedEntity {
   @DecimalMin("1")
-  private double initialCap;
+  private double cap;
+
+  private String emoji;
 
   @Override
   public boolean isValid(GameRules gameRules) {

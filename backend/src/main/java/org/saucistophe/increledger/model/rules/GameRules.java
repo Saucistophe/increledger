@@ -5,7 +5,6 @@ import io.quarkus.logging.Log;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.ws.rs.InternalServerErrorException;
 import java.util.List;
 import lombok.Data;
 
@@ -18,9 +17,8 @@ public class GameRules {
   @NotEmpty @Valid private List<Occupation> occupations;
   @NotEmpty @Valid private List<Tech> techs;
 
-  private static InternalServerErrorException logIdNotFound(String target, String id) {
+  private static void logIdNotFound(String target, String id) {
     Log.info(target + " with id " + id + " not found");
-    return new InternalServerErrorException("Resource with id " + id + " not found");
   }
 
   @JsonIgnore
@@ -28,7 +26,8 @@ public class GameRules {
     var resourceOptional = resources.stream().filter(o -> o.getName().equals(id)).findFirst();
 
     if (resourceOptional.isEmpty()) {
-      throw logIdNotFound("Resource", id);
+      logIdNotFound("Resource", id);
+      return null;
     } else {
       return resourceOptional.get();
     }
@@ -39,7 +38,8 @@ public class GameRules {
     var populationOptional = populations.stream().filter(o -> o.getName().equals(id)).findFirst();
 
     if (populationOptional.isEmpty()) {
-      throw logIdNotFound("Population", id);
+      logIdNotFound("Population", id);
+      return null;
     } else {
       return populationOptional.get();
     }
@@ -50,7 +50,8 @@ public class GameRules {
     var occupationOptional = occupations.stream().filter(o -> o.getName().equals(id)).findFirst();
 
     if (occupationOptional.isEmpty()) {
-      throw logIdNotFound("Occupation", id);
+      logIdNotFound("Occupation", id);
+      return null;
     } else {
       return occupationOptional.get();
     }
@@ -61,7 +62,8 @@ public class GameRules {
     var techOptional = techs.stream().filter(o -> o.getName().equals(id)).findFirst();
 
     if (techOptional.isEmpty()) {
-      throw logIdNotFound("Tech", id);
+      logIdNotFound("Tech", id);
+      return null;
     } else {
       return techOptional.get();
     }
