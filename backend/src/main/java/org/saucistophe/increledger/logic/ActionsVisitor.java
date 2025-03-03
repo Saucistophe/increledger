@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.actions.AssignOccupation;
 import org.saucistophe.increledger.model.actions.Research;
+import org.saucistophe.increledger.model.actions.RespondToDialog;
 import org.saucistophe.increledger.model.actions.UnassignOccupation;
 import org.saucistophe.increledger.model.rules.GameRules;
 
@@ -125,5 +126,24 @@ public class ActionsVisitor {
     var gameOccupations = game.getOccupations();
     var amount = gameOccupations.getOrDefault(occupation, 0L);
     gameOccupations.put(occupation, amount - numbersOfAssignees);
+  }
+
+  public boolean isValid(RespondToDialog respondToDialog, Game game) {
+
+    // You can only respond to the first dialog that popped.
+    if (game.getDialogs().isEmpty()
+        || !game.getDialogs().getFirst().equals(respondToDialog.getDialog())) return false;
+
+    var dialog = gameRules.getDialogById(respondToDialog.getDialog());
+    if (dialog == null) return false;
+    var choice = dialog.getDialogChoiceByName(respondToDialog.getChoice());
+    return choice != null;
+  }
+
+  public void execute(RespondToDialog respondToDialog, Game game) {
+    var dialog = gameRules.getDialogById(respondToDialog.getDialog());
+    var choice = dialog.getDialogChoiceByName(respondToDialog.getChoice());
+    choice.getEffects().forEach(e -> e.applyEffect(game));
+    game.getDialogs().remove(respondToDialog.getDialog());
   }
 }

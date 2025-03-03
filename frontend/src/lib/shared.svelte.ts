@@ -30,9 +30,15 @@ export type Tech = {
     cost: Map<string, number>;
 };
 
+export type Dialog = {
+    name: string;
+    choices: string[];
+};
 
 export type GameDescription = {
     populations: Population[];
     resources: Resource[];
     techs: Tech[];
+    dialogs: Dialog[];
+
 }

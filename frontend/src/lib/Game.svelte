@@ -4,6 +4,7 @@
     import {gameState, startAutoUpdate} from "./game-service.svelte";
     import {onMount} from 'svelte';
     import Tech from "./Tech.svelte";
+    import Dialog from "./Dialog.svelte";
 
     $inspect(gameState.initialized)
 
@@ -18,6 +19,10 @@
 
 <div>
     {#if gameState.initialized && gameState.gameDescription}
+        {#if gameState.gameDescription.dialogs?.length}
+            <Dialog dialog={gameState.gameDescription.dialogs[0]}/>
+        {/if}
+
         <h2>Populations</h2>
         {#each gameState.gameDescription.populations as population}
             <Population population={population}/>

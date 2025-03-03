@@ -8,6 +8,11 @@ import lombok.EqualsAndHashCode;
 @RegisterForReflection
 @EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class NamedEntity extends Entity {
+public class DialogChoice extends EntityWithOneTimeEffects {
   @NotBlank private String name;
+
+  @Override
+  public boolean isValid(GameRules gameRules) {
+    return true;
+  }
 }

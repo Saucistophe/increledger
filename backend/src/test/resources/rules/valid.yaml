@@ -4,6 +4,13 @@ populations:
   - name: people
     initialCount: 2
     cap: 5
+triggers:
+  - flag: big_brain
+    prerequisites:
+      knowledge: 100
+    effects:
+      - type: .AddDialog
+        dialog: congrats_big_brain
 resources:
   - name: wood
     cap: 50
@@ -45,3 +52,8 @@ techs:
       knowledge: 50
     prerequisites:
       knowledge: 10
+dialogs:
+  - name: congrats_big_brain
+    text: You gather lots of knowledge, congrats!
+    choices:
+      - name: ok

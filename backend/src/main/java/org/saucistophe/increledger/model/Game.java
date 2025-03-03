@@ -13,6 +13,9 @@ public class Game {
   private Map<String, Long> occupations = new HashMap<>();
   private Map<String, Long> techs = new HashMap<>();
   private Map<String, Double> resources = new HashMap<>();
+  private List<String> dialogs = new ArrayList<>();
+  private List<String> messages = new ArrayList<>();
+  private List<String> flags = new ArrayList<>();
 
   @NotNull private Long timestamp = Instant.now().toEpochMilli();
 

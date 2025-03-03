@@ -20,6 +20,7 @@ import java.util.stream.Stream;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.GameDescription;
 import org.saucistophe.increledger.model.GameDto;
+import org.saucistophe.increledger.model.rules.DialogChoice;
 import org.saucistophe.increledger.model.rules.GameRules;
 import org.saucistophe.increledger.model.rules.NamedEntity;
 import org.saucistophe.increledger.model.rules.Population;
@@ -130,6 +131,13 @@ public class GameService extends GameComputingService {
                       occupations));
         });
 
+    result.setDialogs(new ArrayList<>());
+    for (var dialogName : game.getDialogs()) {
+      var dialog = gameRules.getDialogById(dialogName);
+      var choices = dialog.getChoices().stream().map(DialogChoice::getName).toList();
+      result.getDialogs().add(new GameDescription.DialogDto(dialogName, choices));
+    }
+
     sortAccordingToRules(result);
 
     return result;
@@ -172,7 +180,7 @@ public class GameService extends GameComputingService {
     var previousTime = game.getTimestamp();
     game.updateTimestamp();
     var currentTime = game.getTimestamp();
-    var ellapsedMillis = currentTime - previousTime;
+    var elapsedMillis = currentTime - previousTime;
 
     var actions = gameDto.getActions();
     if (actions == null) {
@@ -187,7 +195,7 @@ public class GameService extends GameComputingService {
       var amount = producedResource.getValue();
 
       var existingAmount = game.getResources().getOrDefault(resource, 0.);
-      var newAmount = existingAmount + amount * ellapsedMillis / 1000.;
+      var newAmount = existingAmount + amount * elapsedMillis / 1000.;
       newAmount = Math.min(newAmount, resourceCaps.get(resource));
       game.getResources().put(resource, newAmount);
     }
@@ -212,11 +220,22 @@ public class GameService extends GameComputingService {
       game.getResources().putIfAbsent(producedResource, 0.);
 
     for (var action : actions) {
+      // TODO forbid actions other than replying to dialogs if there is one active
       if (!action.acceptValidation(actionsVisitor, game)) {
         Log.error("Invalid action: " + action);
         throw new BadRequestException("Invalid action");
       }
       action.acceptExecution(actionsVisitor, game);
+    }
+
+    // Triggers
+    for (var trigger : gameRules.getTriggers()) {
+      if (!game.getFlags().contains(trigger.getFlag())) {
+        if (game.hasAny(trigger.getPrerequisites())) {
+          game.getFlags().add(trigger.getFlag());
+          trigger.getEffects().forEach(effect -> effect.applyEffect(game));
+        }
+      }
     }
 
     // Sign the game
