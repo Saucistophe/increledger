@@ -59,7 +59,8 @@ public class RulesConfiguration {
                 gameRules.getTechs(),
                 gameRules.getResources(),
                 gameRules.getPopulations(),
-                gameRules.getResources())
+                gameRules.getResources(),
+                gameRules.getDialogs())
             .flatMap(Collection::stream)
             .filter(e -> !e.isValid(gameRules))
             .toList();
