@@ -13,13 +13,12 @@ triggers:
         dialog: congrats_big_brain
 resources:
   - name: wood
-    cap: 50
+    cap: 20
     emoji: 🪵
   - name: food
     cap: 50
     emoji: 🍗
   - name: stone
-    cap: 50
     emoji: 🪨
   - name: knowledge
     cap: 100
@@ -46,12 +45,31 @@ occupations:
     prerequisites:
       quarry_workers: 1
 techs:
+  - name: wood_shed
+    cap: 2
+    cost:
+      wood: 20
+    prerequisites:
+      wood: 10
+    effects:
+      - type: .IncreaseCap
+        target: wood
+        amount: 30
+  - name: shed_builders
+    cost:
+      wood: 80
+    prerequisites:
+      wood: 70
+    effects:
+      - type: .IncreaseCap
+        target: wood_shed
+        amount: 3
   - name: quarry_workers
     cap: 1
     cost:
       knowledge: 50
     prerequisites:
-      knowledge: 10
+      knowledge: 20
 dialogs:
   - name: congrats_big_brain
     choices:

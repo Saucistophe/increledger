@@ -18,7 +18,7 @@ class RulesConfigurationTest {
 
     assertEquals(4, rules.getResources().size());
     assertEquals("wood", rules.getResources().getFirst().getName());
-    assertEquals(50, rules.getResources().getFirst().getCap());
+    assertEquals(20, rules.getResources().getFirst().getCap());
 
     assertEquals(3, rules.getOccupations().size());
     assertEquals("woodcutter", rules.getOccupations().getFirst().getName());
@@ -36,7 +36,7 @@ class RulesConfigurationTest {
       rulesConfiguration.loadGameRules();
       fail("A validation exception should have been thrown");
     } catch (ConstraintViolationException e) {
-      assertEquals(14, e.getConstraintViolations().size());
+      assertEquals(12, e.getConstraintViolations().size());
     }
   }
 }

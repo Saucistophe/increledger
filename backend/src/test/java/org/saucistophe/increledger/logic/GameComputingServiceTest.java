@@ -41,10 +41,41 @@ class GameComputingServiceTest {
   }
 
   @Test
-  void getResourcesCaps() {}
+  void getResourcesCaps() {
+    var game = new Game();
+
+    assertEquals(
+        Map.of("wood", 20.0, "food", 50.0, "stone", -1.0, "knowledge", 100.0),
+        gameComputingService.getResourcesCaps(game));
+
+    game.getTechs().put("wood_shed", 1L);
+
+    assertEquals(
+        Map.of("wood", 50.0, "food", 50.0, "stone", -1.0, "knowledge", 100.0),
+        gameComputingService.getResourcesCaps(game));
+
+    game.getTechs().put("wood_shed", 2L);
+
+    assertEquals(
+        Map.of("wood", 80.0, "food", 50.0, "stone", -1.0, "knowledge", 100.0),
+        gameComputingService.getResourcesCaps(game));
+  }
 
   @Test
-  void getTechCaps() {}
+  void getTechCaps() {
+    var game = new Game();
+    assertEquals(
+        Map.of("quarry_workers", 1L, "wood_shed", 2L, "shed_builders", -1L),
+        gameComputingService.getTechCaps(game));
+    game.getTechs().put("shed_builders", 1L);
+    assertEquals(
+        Map.of("quarry_workers", 1L, "wood_shed", 5L, "shed_builders", -1L),
+        gameComputingService.getTechCaps(game));
+    game.getTechs().put("shed_builders", 2L);
+    assertEquals(
+        Map.of("quarry_workers", 1L, "wood_shed", 8L, "shed_builders", -1L),
+        gameComputingService.getTechCaps(game));
+  }
 
   @Test
   void getPopulationCaps() {}

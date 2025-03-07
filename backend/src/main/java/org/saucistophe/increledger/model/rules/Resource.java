@@ -9,8 +9,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Resource extends NamedEntity {
-  @DecimalMin("1")
-  private double cap;
+  @DecimalMin("-1")
+  private double cap = -1;
 
   private String emoji;
 
