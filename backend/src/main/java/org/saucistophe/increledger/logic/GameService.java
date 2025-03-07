@@ -10,6 +10,7 @@ import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
 import io.quarkus.runtime.util.StringUtil;
 import jakarta.enterprise.event.Observes;
+import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
@@ -30,16 +31,12 @@ import org.saucistophe.increledger.model.rules.Population;
 @Singleton
 public class GameService extends GameComputingService {
 
-  private final JsonNode translations;
   protected ObjectMapper objectMapperForSignature;
 
+  @Inject
   public GameService(
-      GameRules gameRules,
-      CryptoService cryptoService,
-      ActionsVisitor actionsVisitor,
-      JsonNode translations) {
+      GameRules gameRules, CryptoService cryptoService, ActionsVisitor actionsVisitor) {
     super(gameRules, cryptoService, actionsVisitor);
-    this.translations = translations;
   }
 
   void startup(@Observes StartupEvent event) {
@@ -65,10 +62,10 @@ public class GameService extends GameComputingService {
   public GameDescription getDescription(Game game, String language) {
 
     JsonNode translation;
-    if (!StringUtil.isNullOrEmpty(language) && translations.at("/" + language) != null) {
-      System.out.println("yooo");
-      translation = translations.at("/" + language);
-    } else translation = translations;
+    if (!StringUtil.isNullOrEmpty(language)
+        && gameRules.getTranslations().at("/" + language) != null)
+      translation = gameRules.getTranslations().at("/" + language);
+    else translation = gameRules.getTranslations();
 
     var result = new GameDescription();
 
@@ -136,7 +133,6 @@ public class GameService extends GameComputingService {
                           occupationCount,
                           occupation.getCap())); // TODO handle occupations caps...
                 }
-                Log.info("occupation." + occupationName);
               });
           result
               .getPopulations()
@@ -148,13 +144,19 @@ public class GameService extends GameComputingService {
                       populationsCaps.get(populationName),
                       freePopulations.get(populationName),
                       occupations));
-          Log.info("population." + populationName);
         });
 
     result.setDialogs(new ArrayList<>());
     for (var dialogName : game.getDialogs()) {
       var dialog = gameRules.getDialogById(dialogName);
-      var choices = dialog.getChoices().stream().map(DialogChoice::getName).toList();
+      var choices =
+          dialog.getChoices().stream()
+              .map(DialogChoice::getName)
+              .map(
+                  n ->
+                      new GameDescription.DialogChoiceDto(
+                          n, translation.at("/dialog/choice/" + n).asText()))
+              .toList();
       result
           .getDialogs()
           .add(
@@ -263,7 +265,7 @@ public class GameService extends GameComputingService {
     }
 
     List<String> availableLanguages = new ArrayList<>();
-    translations.fieldNames().forEachRemaining(availableLanguages::add);
+    gameRules.getTranslations().fieldNames().forEachRemaining(availableLanguages::add);
 
     var resultGameDto = new GameDto();
     resultGameDto.setSettings(

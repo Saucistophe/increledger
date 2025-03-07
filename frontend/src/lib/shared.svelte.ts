@@ -10,12 +10,14 @@ export type Resource = {
 
 export type Occupation = {
     name: string;
+    translation: string;
     count: number;
     cap: number;
 }
 
 export type Population = {
     name: string;
+    translation: string;
     count: number;
     cap: number;
     occupations: Occupation[];
@@ -25,14 +27,21 @@ export type Population = {
 
 export type Tech = {
     name: string;
+    translation: string;
     count: number;
     cap: number;
     cost: Map<string, number>;
 };
 
+export type DialogChoice = {
+    name: string;
+    translation: string;
+}
+
 export type Dialog = {
     name: string;
-    choices: string[];
+    translation: string;
+    choices: DialogChoice[];
 };
 
 export type GameDescription = {

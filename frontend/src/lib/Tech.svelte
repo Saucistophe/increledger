@@ -13,7 +13,7 @@
     }
 </script>
 
-<p>{tech.name}: {tech.count}
+<p>{tech.translation||tech.name}: {tech.count}
     {#if tech.cap >= 0} / {tech.cap}{/if}
     <button disabled="{ tech.cap >= 0 && tech.count >= tech.cap || !canAfford(tech.cost)}"
             onclick={()=>build(tech.name)}>+

@@ -1,6 +1,7 @@
 package org.saucistophe.increledger.model.rules;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import jakarta.validation.Valid;
@@ -19,6 +20,7 @@ public class GameRules {
   @NotEmpty @Valid private List<Tech> techs;
   @Valid private List<Dialog> dialogs;
   @Valid private List<OneTimeTrigger> triggers;
+  private JsonNode translations;
 
   private static void logIdNotFound(String target, String id) {
     Log.info(target + " with id " + id + " not found");

@@ -13,8 +13,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class Dialog extends NamedEntity {
-  // Todo add translations
-  private @NotEmpty String text;
   private @NotEmpty @Valid List<DialogChoice> choices;
 
   @JsonIgnore

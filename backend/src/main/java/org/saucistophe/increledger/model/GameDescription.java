@@ -27,7 +27,9 @@ public class GameDescription {
   public record TechDto(
       String name, String translation, long count, long cap, Map<String, Double> cost) {}
 
-  public record DialogDto(String name, String translation, List<String> choices) {}
+  public record DialogDto(String name, String translation, List<DialogChoiceDto> choices) {}
+
+  public record DialogChoiceDto(String name, String translation) {}
 
   List<ResourceDto> resources;
   List<PopulationDto> populations;

@@ -54,6 +54,23 @@ techs:
       knowledge: 10
 dialogs:
   - name: congrats_big_brain
-    text: You gather lots of knowledge, congrats!
     choices:
       - name: ok
+# TODO Allow collecting different files
+translations:
+  us:
+    resource:
+      wood: Wood
+  fr:
+    resource:
+      wood: Bois
+      stone: Pierre
+      knowledge: Savoir
+    population:
+      people: Peuple
+    occupation:
+      woodcutter: Bûcheron
+      researcher: Chercheur
+      quarry_worker: Tailleur
+    tech:
+      quarry_workers: Tailleurs de pierre

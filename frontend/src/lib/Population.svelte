@@ -22,9 +22,9 @@
 
 </script>
 
-<h2>{population.name} ({population.count}/{population.cap})</h2>
+<h2>{population.translation||population.name} ({population.count}/{population.cap})</h2>
 {#each population.occupations as occupation}
-    <p>{occupation.name}: {occupation.count}
+    <p>{occupation.translation||occupation.name}: {occupation.count}
         {#if occupation.cap >= 0} / {occupation.cap}{/if}
         <button class="minus" disabled="{occupation.count <= 0}" onclick={()=>unassign(occupation.name)}>-</button>
         <button class="plus" disabled="{population.freePopulation <= 0 || (population.cap >= 0 && occupation.count >= population.cap)}"
