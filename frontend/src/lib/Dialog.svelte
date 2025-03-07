@@ -15,9 +15,9 @@
 
 <div class="modal">
     <div class="modal-content">
-        <span class="name"> {dialog.name}</span>
+        <span class="name"> {dialog.translation || dialog.name}</span>
         {#each dialog.choices as choice}
-            <button onclick="{()=>respond(choice)}"> { choice }</button>
+            <button onclick="{()=>respond(choice.name)}"> { choice.translation || choice.name }</button>
         {/each}
     </div>
 </div>
