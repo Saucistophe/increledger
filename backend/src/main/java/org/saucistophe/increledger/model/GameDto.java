@@ -14,7 +14,7 @@ public class GameDto {
 
   @Valid private Game game;
   @NotBlank private String signature;
-  SettingsDto settings;
+  SettingsDto settings = new SettingsDto(List.of(), null);
 
   private List<Action> actions = new ArrayList<>();
 

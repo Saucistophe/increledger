@@ -19,13 +19,11 @@ resources:
     cap: -1
 occupations:
   # Missing name
-  - unlocked: true
-    effects:
+  - effects:
       - type: .RawProduction
         resource: wood
         amount: 1
   - name: ""
-    unlocked: true
     effects:
       - type: .RawProduction
         resource: stone
@@ -37,12 +35,13 @@ techs:
   - cost:
       knowledge: 50
     effects:
-      - type: .Unlock
-        target: quarry_worker
+      - type: .IncreasePopulation
+        target: people
+        amount: 1
   # Missing type and bugged type hard-crash the serialization and are not tested.
   # Missing occupation
   - name: quarry_workers
     cost:
       knowledge: 50
     effects:
-      - type: .Unlock
+      - type: .IncreasePopulation

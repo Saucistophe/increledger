@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.validation.ConstraintViolationException;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.saucistophe.increledger.model.rules.effects.RawProduction;
 
@@ -19,9 +20,10 @@ class RulesConfigurationTest {
     assertEquals("wood", rules.getResources().getFirst().getName());
     assertEquals(50, rules.getResources().getFirst().getCap());
 
-    assertEquals(2, rules.getOccupations().size());
+    assertEquals(3, rules.getOccupations().size());
     assertEquals("woodcutter", rules.getOccupations().getFirst().getName());
-    assertTrue(rules.getOccupations().getFirst().getPrerequisites().isEmpty());
+    assertNull(rules.getOccupations().getFirst().getPrerequisites());
+    assertEquals(rules.getOccupations().get(2).getPrerequisites(), Map.of("quarry_workers", 1.));
     assertEquals(
         new RawProduction("wood", 1.), rules.getOccupations().getFirst().getEffects().getFirst());
   }
@@ -34,7 +36,7 @@ class RulesConfigurationTest {
       rulesConfiguration.loadGameRules();
       fail("A validation exception should have been thrown");
     } catch (ConstraintViolationException e) {
-      assertEquals(13, e.getConstraintViolations().size());
+      assertEquals(14, e.getConstraintViolations().size());
     }
   }
 }
