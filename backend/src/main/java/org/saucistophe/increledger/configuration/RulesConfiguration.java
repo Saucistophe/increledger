@@ -12,6 +12,7 @@ import jakarta.validation.Validator;
 import jakarta.ws.rs.Produces;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
@@ -36,7 +37,15 @@ public class RulesConfiguration {
 
     try (var validatorFactory = Validation.buildDefaultValidatorFactory()) {
       validator = validatorFactory.getValidator();
-      gameRules = objectMapper.readValue(new File(rulesPath), GameRules.class);
+
+      StringBuilder allFilesContent = new StringBuilder();
+      var allPaths = rulesPath.split(",");
+      for (String path : allPaths) {
+        var content = Files.readString(new File(path).toPath());
+        content = content.replace("---\n", "");
+        allFilesContent.append(content).append("\n");
+      }
+      gameRules = objectMapper.readValue(allFilesContent.toString(), GameRules.class);
     } catch (IOException e) {
       throw new ConfigurationException("Could not load rules from input file", e);
     }

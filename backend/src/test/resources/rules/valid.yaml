@@ -56,7 +56,6 @@ dialogs:
   - name: congrats_big_brain
     choices:
       - name: ok
-# TODO Allow collecting different files
 translations:
   us:
     resource:
