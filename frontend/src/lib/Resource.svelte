@@ -5,7 +5,7 @@
 </script>
 
 <div class="line">
-    <span class="name">{resource.emoji} {resource.name}</span>
+    <span class="name">{resource.emoji} {resource.translation || resource.name}</span>
     <span class="amount">{resource.amount.toFixed(1)} / {resource.cap}</span>
     <span class="production"> {resource.production || ''}</span>
 </div>

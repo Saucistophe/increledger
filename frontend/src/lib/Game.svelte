@@ -5,6 +5,7 @@
     import {onMount} from 'svelte';
     import Tech from "./Tech.svelte";
     import Dialog from "./Dialog.svelte";
+    import Settings from "./Settings.svelte";
 
     $inspect(gameState.initialized)
 
@@ -36,8 +37,10 @@
         {#each gameState.gameDescription.techs as tech}
             <Tech tech={tech}/>
         {/each}
+        <Settings settings={gameState.settings}/>
     {/if}
 </div>
+
 
 <style>
     .resources {

@@ -7,16 +7,27 @@ import lombok.Data;
 @Data
 public class GameDescription {
   public record ResourceDto(
-      String name, double amount, double cap, double production, String emoji) {}
+      String name,
+      String translation,
+      double amount,
+      double cap,
+      double production,
+      String emoji) {}
 
-  public record OccupationDto(String name, long count, long cap) {}
+  public record OccupationDto(String name, String translation, long count, long cap) {}
 
   public record PopulationDto(
-      String name, long count, long cap, long freePopulation, List<OccupationDto> occupations) {}
+      String name,
+      String translation,
+      long count,
+      long cap,
+      long freePopulation,
+      List<OccupationDto> occupations) {}
 
-  public record TechDto(String name, long count, long cap, Map<String, Double> cost) {}
+  public record TechDto(
+      String name, String translation, long count, long cap, Map<String, Double> cost) {}
 
-  public record DialogDto(String name, List<String> choices) {}
+  public record DialogDto(String name, String translation, List<String> choices) {}
 
   List<ResourceDto> resources;
   List<PopulationDto> populations;

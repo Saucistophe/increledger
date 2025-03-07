@@ -10,8 +10,11 @@ import org.saucistophe.increledger.model.actions.Action;
 @Data
 public class GameDto {
 
+  public record SettingsDto(List<String> supportedLanguages, String selectedLanguage) {}
+
   @Valid private Game game;
   @NotBlank private String signature;
+  SettingsDto settings;
 
   private List<Action> actions = new ArrayList<>();
 

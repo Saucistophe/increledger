@@ -1,6 +1,6 @@
-
 export type Resource = {
     name: string;
+    translation: string;
     amount: number;
     cap: number;
     production: number;
@@ -40,5 +40,4 @@ export type GameDescription = {
     resources: Resource[];
     techs: Tech[];
     dialogs: Dialog[];
-
 }

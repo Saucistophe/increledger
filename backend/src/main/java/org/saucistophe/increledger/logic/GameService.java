@@ -2,11 +2,13 @@ package org.saucistophe.increledger.logic;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import io.quarkus.logging.Log;
 import io.quarkus.runtime.StartupEvent;
+import io.quarkus.runtime.util.StringUtil;
 import jakarta.enterprise.event.Observes;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
@@ -28,11 +30,16 @@ import org.saucistophe.increledger.model.rules.Population;
 @Singleton
 public class GameService extends GameComputingService {
 
+  private final JsonNode translations;
   protected ObjectMapper objectMapperForSignature;
 
   public GameService(
-      GameRules gameRules, CryptoService cryptoService, ActionsVisitor actionsVisitor) {
+      GameRules gameRules,
+      CryptoService cryptoService,
+      ActionsVisitor actionsVisitor,
+      JsonNode translations) {
     super(gameRules, cryptoService, actionsVisitor);
+    this.translations = translations;
   }
 
   void startup(@Observes StartupEvent event) {
@@ -55,7 +62,14 @@ public class GameService extends GameComputingService {
     return process(resultGameDto);
   }
 
-  public GameDescription getDescription(Game game) {
+  public GameDescription getDescription(Game game, String language) {
+
+    JsonNode translation;
+    if (!StringUtil.isNullOrEmpty(language) && translations.at("/" + language) != null) {
+      System.out.println("yooo");
+      translation = translations.at("/" + language);
+    } else translation = translations;
+
     var result = new GameDescription();
 
     // Keep only resources with actual production, or more than 0 resource.
@@ -77,6 +91,7 @@ public class GameService extends GameComputingService {
             .add(
                 new GameDescription.ResourceDto(
                     resource.getName(),
+                    translation.at("/resource/" + resource.getName()).asText(),
                     game.getResources().get(resource.getName()),
                     resourcesCaps.get(resource.getName()),
                     production.getOrDefault(resource.getName(), 0.),
@@ -95,6 +110,7 @@ public class GameService extends GameComputingService {
               .add(
                   new GameDescription.TechDto(
                       techName,
+                      translation.at("/tech/" + techName).asText(),
                       techCount,
                       techCaps.get(techName),
                       tech.getCost())); // TODO handle exponential cost
@@ -116,26 +132,34 @@ public class GameService extends GameComputingService {
                   occupations.add(
                       new GameDescription.OccupationDto(
                           occupationName,
+                          translation.at("/occupation/" + occupationName).asText(),
                           occupationCount,
                           occupation.getCap())); // TODO handle occupations caps...
                 }
+                Log.info("occupation." + occupationName);
               });
           result
               .getPopulations()
               .add(
                   new GameDescription.PopulationDto(
                       populationName,
+                      translation.at("/population/" + populationName).asText(),
                       populationCount,
                       populationsCaps.get(populationName),
                       freePopulations.get(populationName),
                       occupations));
+          Log.info("population." + populationName);
         });
 
     result.setDialogs(new ArrayList<>());
     for (var dialogName : game.getDialogs()) {
       var dialog = gameRules.getDialogById(dialogName);
       var choices = dialog.getChoices().stream().map(DialogChoice::getName).toList();
-      result.getDialogs().add(new GameDescription.DialogDto(dialogName, choices));
+      result
+          .getDialogs()
+          .add(
+              new GameDescription.DialogDto(
+                  dialogName, translation.at("/dialog/" + dialogName).asText(), choices));
     }
 
     sortAccordingToRules(result);
@@ -238,11 +262,20 @@ public class GameService extends GameComputingService {
       }
     }
 
-    // Sign the game
+    List<String> availableLanguages = new ArrayList<>();
+    translations.fieldNames().forEachRemaining(availableLanguages::add);
+
     var resultGameDto = new GameDto();
+    resultGameDto.setSettings(
+        new GameDto.SettingsDto(
+            availableLanguages,
+            gameDto.getSettings().selectedLanguage() != null
+                ? gameDto.getSettings().selectedLanguage()
+                : availableLanguages.getFirst()));
     resultGameDto.setGame(game);
     resultGameDto.setSignature(cryptoService.sign(toJson(game)));
-    resultGameDto.setGameDescription(getDescription(game));
+    resultGameDto.setGameDescription(
+        getDescription(game, resultGameDto.getSettings().selectedLanguage()));
 
     return resultGameDto;
   }

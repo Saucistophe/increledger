@@ -1,11 +1,17 @@
 import type {GameDescription} from "./shared.svelte";
 
+export type Settings = {
+    supportedLanguages: string[];
+    selectedLanguage: string;
+}
+
 type GameState = {
     initialized: boolean;
     game: object; // The goal is not to care about this object.
     gameDescription: GameDescription;
     actions: any[];
     signature: string;
+    settings: Settings;
 }
 
 export const gameState: GameState = $state({initialized: false} as any as GameState);
@@ -14,11 +20,7 @@ export const gameState: GameState = $state({initialized: false} as any as GameSt
 const storage = window.localStorage.getItem('gameState');
 if (storage) {
     const storedGameState = JSON.parse(storage) as GameState;
-    gameState.gameDescription = storedGameState.gameDescription;
-    gameState.signature = storedGameState.signature;
-    gameState.game = storedGameState.game;
-    gameState.actions = [];
-    gameState.initialized = true;
+    Object.assign(gameState, storedGameState);
 }
 
 let updating = false;
@@ -29,9 +31,7 @@ export async function updateGame() {
         const response = await fetch('/api/game');
         const newGame: GameState = await response.json();
 
-        gameState.gameDescription = newGame.gameDescription;
-        gameState.signature = newGame.signature;
-        gameState.game = newGame.game;
+        Object.assign(gameState, newGame);
         gameState.actions = [];
         gameState.initialized = true;
     } else {
@@ -46,10 +46,9 @@ export async function updateGame() {
             console.error(`Error received: ${response.status}`);
         } else {
             const newGame: GameState = await response.json();
-            gameState.gameDescription = newGame.gameDescription;
-            gameState.signature = newGame.signature;
-            gameState.game = newGame.game;
+            Object.assign(gameState, newGame);
             gameState.actions = [];
+            gameState.initialized = true;
         }
     }
     updating = false;
