@@ -45,6 +45,8 @@ export type Dialog = {
 };
 
 export type GameDescription = {
+    title: string;
+    timeSpent: string;
     populations: Population[];
     resources: Resource[];
     techs: Tech[];

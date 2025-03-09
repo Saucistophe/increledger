@@ -1,6 +1,6 @@
 <script lang="ts">
 
-    import type {Settings} from "./game-service.svelte";
+    import {resetGame, type Settings} from "./game-service.svelte";
 
     let expanded = $state(false);
     let {settings}: { settings: Settings } = $props();
@@ -11,6 +11,11 @@
             .split('')
             .map((char) => 127397 + char.charCodeAt(0))
         return String.fromCodePoint(...codePoints)
+    }
+
+    function resetGameClicked() {
+        // TODO: Confirmation dialog
+        resetGame();
     }
 </script>
 
@@ -26,12 +31,9 @@
                        >{getFlagEmoji(language)}{language}</option>
             {/each}
         </select>
+        <button onclick="{() => resetGame()}">Reset</button>
     </div>
 </div>
 
-<style>.settings {
-    position: fixed;
-    top: 0;
-    right: 0;
-}
+<style>
 </style>

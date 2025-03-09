@@ -14,10 +14,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.InternalServerErrorException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.saucistophe.increledger.model.Game;
@@ -68,6 +65,9 @@ public class GameService extends GameComputingService {
     else translation = gameRules.getTranslations();
 
     var result = new GameDescription();
+    result.setTitle(gameRules.getTitle());
+
+    result.setTimeSpent(getTimeSpent(game, language));
 
     // Keep only resources with actual production, or more than 0 resource.
     var production = getCurrentProduction(game);
@@ -167,6 +167,11 @@ public class GameService extends GameComputingService {
     sortAccordingToRules(result);
 
     return result;
+  }
+
+  private String getTimeSpent(Game game, String language) {
+
+    return "todo";
   }
 
   private void sortAccordingToRules(GameDescription result) {

@@ -55,6 +55,22 @@ export async function updateGame() {
     window.localStorage.setItem('gameState', JSON.stringify(gameState));
 }
 
+
+export async function resetGame() {
+    updating = true;
+
+    const response = await fetch('/api/game');
+    const newGame: GameState = await response.json();
+
+    Object.assign(gameState, newGame);
+    gameState.actions = [];
+    gameState.initialized = true;
+
+    updating = false;
+    window.localStorage.setItem('gameState', JSON.stringify(gameState));
+}
+
+
 let autoUpdateEnabled: boolean;
 
 function autoUpdate() {

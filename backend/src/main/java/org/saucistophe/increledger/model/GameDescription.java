@@ -31,8 +31,10 @@ public class GameDescription {
 
   public record DialogChoiceDto(String name, String translation) {}
 
-  List<ResourceDto> resources;
-  List<PopulationDto> populations;
-  List<TechDto> techs;
-  List<DialogDto> dialogs;
+  private String title;
+  private String timeSpent;
+  private List<ResourceDto> resources;
+  private List<PopulationDto> populations;
+  private List<TechDto> techs;
+  private List<DialogDto> dialogs;
 }

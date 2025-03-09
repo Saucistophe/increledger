@@ -1,5 +1,6 @@
 # $schema: ../../../../target/schemas/GameRules-schema.json
 ---
+title: Invalid Rules for testing
 populations:
   # Invalid count
   - name: people

@@ -1,5 +1,9 @@
 # $schema: ../../../../target/schemas/GameRules-schema.json
 ---
+title: Demo game rules
+timeUnits:
+  days: 10
+  years: 78
 populations:
   - name: people
     initialCount: 2

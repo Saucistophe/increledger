@@ -8,11 +8,18 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 
 @RegisterForReflection
 @Data
 public class GameRules {
+
+  @NotEmpty private String title;
+
+  @NotEmpty
+  private Map<String, Integer> timeUnits =
+      Map.of("seconds", 1, "minutes", 60, "hours", 60, "days", 24, "weeks", 7);
 
   @NotEmpty @Valid private List<Resource> resources;
   @NotEmpty @Valid private List<Population> populations;

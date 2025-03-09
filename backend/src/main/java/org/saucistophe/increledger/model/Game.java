@@ -17,6 +17,7 @@ public class Game {
   private List<String> messages = new ArrayList<>();
   private List<String> flags = new ArrayList<>();
 
+  @NotNull private Long createdAt = Instant.now().toEpochMilli();
   @NotNull private Long timestamp = Instant.now().toEpochMilli();
 
   public void updateTimestamp() {
