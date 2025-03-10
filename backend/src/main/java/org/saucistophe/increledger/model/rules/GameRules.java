@@ -17,10 +17,7 @@ public class GameRules {
 
   @NotEmpty private String title;
 
-  @NotEmpty
-  private Map<String, Integer> timeUnits =
-      Map.of("seconds", 1, "minutes", 60, "hours", 60, "days", 24, "weeks", 7);
-
+  @NotEmpty private Map<String, Integer> timeUnits;
   @NotEmpty @Valid private List<Resource> resources;
   @NotEmpty @Valid private List<Population> populations;
   @NotEmpty @Valid private List<Occupation> occupations;

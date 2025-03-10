@@ -67,7 +67,7 @@ public class GameService extends GameComputingService {
     var result = new GameDescription();
     result.setTitle(gameRules.getTitle());
 
-    result.setTimeSpent(getTimeSpent(game, language));
+    result.setTimeSpent(getTimeSpent(game, translation));
 
     // Keep only resources with actual production, or more than 0 resource.
     var production = getCurrentProduction(game);
@@ -169,9 +169,33 @@ public class GameService extends GameComputingService {
     return result;
   }
 
-  private String getTimeSpent(Game game, String language) {
+  protected String getTimeSpent(Game game, JsonNode translation) {
+    var timeUnitsSpent = new LinkedHashMap<String, Long>();
+    var secondsElapsed = (game.getTimestamp() - game.getCreatedAt()) / 1000;
+    List<Long> unitDurations = new ArrayList<>();
+    List<String> unitNames = new ArrayList<>();
 
-    return "todo";
+    var previousDuration = 1L;
+    for (var entry : gameRules.getTimeUnits().entrySet()) {
+      var newDuration = previousDuration * entry.getValue();
+      unitDurations.add(newDuration);
+      unitNames.add(entry.getKey());
+      previousDuration = newDuration;
+    }
+
+    for (var i = gameRules.getTimeUnits().size() - 1; i >= 0; i--) {
+      var currentUnitDuration = unitDurations.get(i);
+      var currentUnitName = unitNames.get(i);
+
+      if (secondsElapsed >= currentUnitDuration) {
+        timeUnitsSpent.put(currentUnitName, secondsElapsed / currentUnitDuration);
+        secondsElapsed = secondsElapsed % currentUnitDuration;
+      }
+    }
+
+    return timeUnitsSpent.entrySet().stream()
+        .map(e -> e.getValue() + " " + translation.at("/time/" + e.getKey()))
+        .collect(Collectors.joining(" "));
   }
 
   private void sortAccordingToRules(GameDescription result) {
