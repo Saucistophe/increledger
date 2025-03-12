@@ -36,7 +36,7 @@ class RulesConfigurationTest {
       rulesConfiguration.loadGameRules();
       fail("A validation exception should have been thrown");
     } catch (ConstraintViolationException e) {
-      assertEquals(13, e.getConstraintViolations().size());
+      assertEquals(12, e.getConstraintViolations().size());
     }
   }
 }

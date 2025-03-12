@@ -13,7 +13,7 @@ public class Population extends NamedEntityWithEffects {
   @Min(0)
   private long initialCount = 0;
 
-  @Min(0)
+  @Min(-1)
   private long cap = 0;
 
   @Override

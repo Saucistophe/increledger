@@ -19,6 +19,6 @@ public class IncreaseCap implements Effect {
   public boolean isValid(GameRules gameRules) {
     return gameRules.getResourceById(target) != null
         || gameRules.getTechById(target) != null
-        || gameRules.getOccupationById(target) != null;
+        || gameRules.getPopulationById(target) != null;
   }
 }

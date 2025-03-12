@@ -8,6 +8,9 @@ populations:
   - name: people
     initialCount: 2
     cap: 5
+  - name: soldiers
+    initialCount: 0
+    cap: -1
 triggers:
   - flag: big_brain
     prerequisites:
@@ -68,6 +71,14 @@ techs:
       - type: .IncreaseCap
         target: wood_shed
         amount: 3
+  - name: house
+    cap: 2
+    cost:
+      wood: 10
+    effects:
+      - type: .IncreaseCap
+        target: people
+        amount: 2
   - name: quarry_workers
     cap: 1
     cost:
