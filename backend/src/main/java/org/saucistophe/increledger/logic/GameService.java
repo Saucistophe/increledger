@@ -327,7 +327,12 @@ public class GameService extends GameComputingService {
   private static String getTranslationWithFallback(
       JsonNode translation, String path, String fallback) {
     var translationNode = translation.at(path);
-    if (!translationNode.isEmpty() && !translationNode.isNull()) return translationNode.asText();
-    else return fallback;
+    if (!translationNode.isNull()
+        && translationNode.isTextual()
+        && !StringUtil.isNullOrEmpty(translationNode.asText())) {
+      return translationNode.asText();
+    } else {
+      return fallback;
+    }
   }
 }

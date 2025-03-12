@@ -32,5 +32,9 @@ class GameServiceTest {
 
     game.setTimestamp(3_601_000L);
     assertEquals("1 hours 1 seconds", gameService.getTimeSpent(game, translation));
+
+    assertEquals(
+        "1 heures 1 secondes",
+        gameService.getTimeSpent(game, gameService.gameRules.getTranslations().at("/fr")));
   }
 }

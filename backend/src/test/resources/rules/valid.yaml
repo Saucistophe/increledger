@@ -95,3 +95,8 @@ translations:
       quarry_worker: Tailleur
     tech:
       quarry_workers: Tailleurs de pierre
+    time:
+      days: jours
+      hours: heures
+      years: ans
+      seconds: secondes
