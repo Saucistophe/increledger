@@ -194,7 +194,11 @@ public class GameService extends GameComputingService {
     }
 
     return timeUnitsSpent.entrySet().stream()
-        .map(e -> e.getValue() + " " + translation.at("/time/" + e.getKey()))
+        .map(
+            e ->
+                e.getValue()
+                    + " "
+                    + getTranslationWithFallback(translation, "/time/" + e.getKey(), e.getKey()))
         .collect(Collectors.joining(" "));
   }
 
@@ -318,5 +322,12 @@ public class GameService extends GameComputingService {
       Log.error("Could not serialize game", e);
       throw new InternalServerErrorException(e);
     }
+  }
+
+  private static String getTranslationWithFallback(
+      JsonNode translation, String path, String fallback) {
+    var translationNode = translation.at(path);
+    if (!translationNode.isEmpty() && !translationNode.isNull()) return translationNode.asText();
+    else return fallback;
   }
 }
