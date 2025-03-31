@@ -18,6 +18,7 @@ public class GameComputingService {
   protected final GameRules gameRules;
   protected final CryptoService cryptoService;
   protected final ActionsVisitor actionsVisitor;
+  protected final OneTimeEffectVisitor oneTimeEffectVisitor;
 
   public Map<String, Double> getCurrentProduction(Game game) {
     Map<String, Double> result = new HashMap<>();
@@ -106,6 +107,9 @@ public class GameComputingService {
       result.put(population.getName(), population.getInitialCount());
     }
 
+    // TODO gotta find a way to differentiate power and people; growing and dying vs fixed.
+    // One-shot should do the trick, but maybe prevent both? Maybe not?
+    // It would need to be a base population; one-shot could make it vary; then add the bonus here.
     var populationIncreases = getAllEffectsFromEntities(game, IncreasePopulation.class);
     for (var populationIncrease : populationIncreases) {
       result.computeIfPresent(
@@ -115,8 +119,9 @@ public class GameComputingService {
 
     var caps = getPopulationCaps(game);
     for (Population population : gameRules.getPopulations()) {
-      result.computeIfPresent(
-          population.getName(), (k, v) -> Math.min(v, caps.get(population.getName())));
+      if (caps.get(population.getName()) >= 0)
+        result.computeIfPresent(
+            population.getName(), (k, v) -> Math.min(v, caps.get(population.getName())));
     }
 
     return result;

@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.saucistophe.increledger.logic.OneTimeEffectVisitor;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.rules.GameRules;
 
 @RegisterForReflection
 @Data
@@ -17,12 +17,12 @@ public class AddDialog implements OneTimeEffect {
   @NotBlank String dialog;
 
   @Override
-  public boolean isValid(GameRules gameRules) {
-    return gameRules.getDialogById(dialog) != null;
+  public boolean acceptValidation(OneTimeEffectVisitor visitor) {
+    return visitor.isValid(this);
   }
 
   @Override
-  public void applyEffect(Game game) {
-    game.getDialogs().add(dialog);
+  public void acceptExecution(OneTimeEffectVisitor visitor, Game game) {
+    visitor.execute(this, game);
   }
 }

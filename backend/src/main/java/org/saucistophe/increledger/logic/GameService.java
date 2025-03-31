@@ -32,8 +32,11 @@ public class GameService extends GameComputingService {
 
   @Inject
   public GameService(
-      GameRules gameRules, CryptoService cryptoService, ActionsVisitor actionsVisitor) {
-    super(gameRules, cryptoService, actionsVisitor);
+      GameRules gameRules,
+      CryptoService cryptoService,
+      ActionsVisitor actionsVisitor,
+      OneTimeEffectVisitor oneTimeEffectVisitor) {
+    super(gameRules, cryptoService, actionsVisitor, oneTimeEffectVisitor);
   }
 
   void startup(@Observes StartupEvent event) {
@@ -280,20 +283,18 @@ public class GameService extends GameComputingService {
 
     for (var action : actions) {
       // TODO forbid actions other than replying to dialogs if there is one active
-      if (!action.acceptValidation(actionsVisitor, game)) {
-        Log.error("Invalid action: " + action);
-        throw new BadRequestException("Invalid action");
+      if (action.acceptValidation(actionsVisitor, game)) {
+        action.acceptExecution(actionsVisitor, game);
+      } else {
+        Log.error("Skipping invalid action: " + action);
       }
-      action.acceptExecution(actionsVisitor, game);
     }
 
     // Triggers
     for (var trigger : gameRules.getTriggers()) {
-      if (!game.getFlags().contains(trigger.getFlag())) {
-        if (game.hasAny(trigger.getPrerequisites())) {
-          game.getFlags().add(trigger.getFlag());
-          trigger.getEffects().forEach(effect -> effect.applyEffect(game));
-        }
+      if (!game.getFlags().contains(trigger.getFlag()) && game.hasAny(trigger.getPrerequisites())) {
+        game.getFlags().add(trigger.getFlag());
+        trigger.getEffects().forEach(effect -> effect.acceptExecution(oneTimeEffectVisitor, game));
       }
     }
 

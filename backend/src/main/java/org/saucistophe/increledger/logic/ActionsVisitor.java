@@ -17,6 +17,7 @@ public class ActionsVisitor {
 
   private final GameRules gameRules;
   private final GameComputingService gameService;
+  private final OneTimeEffectVisitor oneTimeEffectVisitor;
 
   public boolean isValid(Research research, Game game) {
     var techName = research.getTech();
@@ -143,7 +144,7 @@ public class ActionsVisitor {
   public void execute(RespondToDialog respondToDialog, Game game) {
     var dialog = gameRules.getDialogById(respondToDialog.getDialog());
     var choice = dialog.getDialogChoiceByName(respondToDialog.getChoice());
-    choice.getEffects().forEach(e -> e.applyEffect(game));
+    choice.getEffects().forEach(e -> e.acceptExecution(oneTimeEffectVisitor, game));
     game.getDialogs().remove(respondToDialog.getDialog());
   }
 }

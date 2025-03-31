@@ -6,8 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.saucistophe.increledger.logic.OneTimeEffectVisitor;
 import org.saucistophe.increledger.model.Game;
-import org.saucistophe.increledger.model.rules.GameRules;
 
 @RegisterForReflection
 @Data
@@ -21,13 +21,12 @@ public class AddTech implements OneTimeEffect {
   long count;
 
   @Override
-  public boolean isValid(GameRules gameRules) {
-    return gameRules.getTechById(tech) != null;
+  public boolean acceptValidation(OneTimeEffectVisitor visitor) {
+    return visitor.isValid(this);
   }
 
   @Override
-  public void applyEffect(Game game) {
-    game.getTechs().putIfAbsent(tech, 0L);
-    game.getTechs().put(tech, game.getTechs().get(tech) + count);
+  public void acceptExecution(OneTimeEffectVisitor visitor, Game game) {
+    visitor.execute(this, game);
   }
 }

@@ -39,6 +39,7 @@ occupations:
         amount: 1
   - name: researcher
     population: people
+    populationNeeded: 2
     effects:
       - type: .RawProduction
         resource: knowledge

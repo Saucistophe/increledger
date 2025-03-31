@@ -92,7 +92,15 @@ class GameComputingServiceTest {
   void getCurrentPopulation() {}
 
   @Test
-  void getFreePopulations() {}
+  void getFreePopulations() {
+    var game = new Game();
+    assertEquals(
+        Map.of("people", 2L, "soldiers", 0L), gameComputingService.getFreePopulations(game));
+
+    game.getOccupations().put("researcher", 1L);
+    assertEquals(
+        Map.of("people", 0L, "soldiers", 0L), gameComputingService.getFreePopulations(game));
+  }
 
   @Test
   void getBoosts() {}
