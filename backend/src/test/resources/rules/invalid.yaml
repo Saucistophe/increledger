@@ -4,6 +4,7 @@ title: Invalid Rules for testing
 populations:
   # Invalid count
   - name: people
+
     initialCount: -1
   # Invalid cap
   - name: soldiers

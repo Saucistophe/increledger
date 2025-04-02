@@ -10,7 +10,8 @@ populations:
     cap: 5
   - name: soldiers
     initialCount: 0
-    cap: -1
+  - name: power
+    initialCount: 0
 triggers:
   - flag: big_brain
     prerequisites:
@@ -80,6 +81,22 @@ techs:
       - type: .IncreaseCap
         target: people
         amount: 2
+  - name: barracks
+    cap: 2
+    cost:
+      wood: 10
+    effects:
+      - type: .IncreaseCap
+        target: soldiers
+        amount: 2
+  - name: power plant
+    cap: 2
+    cost:
+      stone: 20
+    effects:
+      - type: .IncreaseCap
+        target: power
+        amount: 10
   - name: quarry_workers
     cap: 1
     cost:

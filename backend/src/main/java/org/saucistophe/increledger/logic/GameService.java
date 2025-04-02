@@ -17,6 +17,7 @@ import jakarta.ws.rs.InternalServerErrorException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.saucistophe.increledger.model.Game;
 import org.saucistophe.increledger.model.GameDescription;
 import org.saucistophe.increledger.model.GameDto;
@@ -29,6 +30,9 @@ import org.saucistophe.increledger.model.rules.Population;
 public class GameService extends GameComputingService {
 
   protected ObjectMapper objectMapperForSignature;
+
+  @ConfigProperty(name = "increledger.timeRate", defaultValue = "1")
+  double timeRate;
 
   @Inject
   public GameService(
@@ -124,6 +128,8 @@ public class GameService extends GameComputingService {
 
     availablePopulations.forEach(
         (populationName, populationCount) -> {
+          if (populationsCaps.get(populationName) == 0) return;
+
           List<GameDescription.OccupationDto> occupations = new ArrayList<>();
           availableOccupations.forEach(
               (occupationName, occupationCount) -> {
@@ -242,7 +248,7 @@ public class GameService extends GameComputingService {
     var previousTime = game.getTimestamp();
     game.updateTimestamp();
     var currentTime = game.getTimestamp();
-    var elapsedMillis = currentTime - previousTime;
+    var elapsedMillis = (currentTime - previousTime) * timeRate;
 
     var actions = gameDto.getActions();
     if (actions == null) {
