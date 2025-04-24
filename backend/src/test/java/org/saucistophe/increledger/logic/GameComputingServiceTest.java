@@ -65,15 +65,51 @@ class GameComputingServiceTest {
   void getTechCaps() {
     var game = new Game();
     assertEquals(
-        Map.of("quarry_workers", 1L, "wood_shed", 2L, "shed_builders", -1L, "house", 2L),
+        Map.of(
+            "quarry_workers",
+            1L,
+            "wood_shed",
+            2L,
+            "shed_builders",
+            -1L,
+            "house",
+            2L,
+            "barracks",
+            2L,
+            "power plant",
+            2L),
         gameComputingService.getTechCaps(game));
     game.getTechs().put("shed_builders", 1L);
     assertEquals(
-        Map.of("quarry_workers", 1L, "wood_shed", 5L, "shed_builders", -1L, "house", 2L),
+        Map.of(
+            "quarry_workers",
+            1L,
+            "wood_shed",
+            5L,
+            "shed_builders",
+            -1L,
+            "house",
+            2L,
+            "barracks",
+            2L,
+            "power plant",
+            2L),
         gameComputingService.getTechCaps(game));
     game.getTechs().put("shed_builders", 2L);
     assertEquals(
-        Map.of("quarry_workers", 1L, "wood_shed", 8L, "shed_builders", -1L, "house", 2L),
+        Map.of(
+            "quarry_workers",
+            1L,
+            "wood_shed",
+            8L,
+            "shed_builders",
+            -1L,
+            "house",
+            2L,
+            "barracks",
+            2L,
+            "power plant",
+            2L),
         gameComputingService.getTechCaps(game));
   }
 
@@ -81,11 +117,14 @@ class GameComputingServiceTest {
   void getPopulationCaps() {
     var game = new Game();
     assertEquals(
-        Map.of("people", 5L, "soldiers", -1L), gameComputingService.getPopulationCaps(game));
+        Map.of("people", 5L, "soldiers", 0L, "power", 0L),
+        gameComputingService.getPopulationCaps(game));
 
     game.getTechs().put("house", 2L);
+    game.getTechs().put("barracks", 1L);
     assertEquals(
-        Map.of("people", 9L, "soldiers", -1L), gameComputingService.getPopulationCaps(game));
+        Map.of("people", 9L, "soldiers", 2L, "power", 0L),
+        gameComputingService.getPopulationCaps(game));
   }
 
   @Test
@@ -95,11 +134,13 @@ class GameComputingServiceTest {
   void getFreePopulations() {
     var game = new Game();
     assertEquals(
-        Map.of("people", 2L, "soldiers", 0L), gameComputingService.getFreePopulations(game));
+        Map.of("people", 2L, "soldiers", 0L, "power", 0L),
+        gameComputingService.getFreePopulations(game));
 
     game.getOccupations().put("researcher", 1L);
     assertEquals(
-        Map.of("people", 0L, "soldiers", 0L), gameComputingService.getFreePopulations(game));
+        Map.of("people", 0L, "soldiers", 0L, "power", 0L),
+        gameComputingService.getFreePopulations(game));
   }
 
   @Test
