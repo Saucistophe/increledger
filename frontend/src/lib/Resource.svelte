@@ -6,7 +6,7 @@
 
 <div class="line">
     <span class="name">{resource.emoji} {resource.translation || resource.name}</span>
-    <span class="amount">{resource.amount.toFixed(1)} / {resource.cap}</span>
+    <span class="amount">{resource.amount.toFixed(1)}{#if resource.cap >= 0} / {resource.cap}{/if}</span>
     <span class="production"> {resource.production || ''}</span>
 </div>
 

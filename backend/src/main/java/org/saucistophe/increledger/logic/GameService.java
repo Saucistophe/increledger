@@ -264,7 +264,8 @@ public class GameService extends GameComputingService {
 
       var existingAmount = game.getResources().getOrDefault(resource, 0.);
       var newAmount = existingAmount + amount * elapsedMillis / 1000.;
-      newAmount = Math.min(newAmount, resourceCaps.get(resource));
+      if (resourceCaps.get(resource) != -1.)
+        newAmount = Math.min(newAmount, resourceCaps.get(resource));
       game.getResources().put(resource, newAmount);
     }
 
